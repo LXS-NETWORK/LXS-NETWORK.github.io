@@ -7,7 +7,7 @@
 // =================================================================
 window.LXS_CONFIG = {
   // Public LXS RPC endpoint (the server node MetaMask/dApp talks to).
-  RPC_URL: "https://lxs.duckdns.org",      // public HTTPS RPC (Caddy in front of the seed's :8545)
+  RPC_URL: "https://lxsnetwork.duckdns.org",      // public HTTPS RPC (Caddy in front of the seed's :8545)
 
   // Chain ID for MetaMask / the launchpad.
   CHAIN_ID: 22540,                         // LXS mainnet
