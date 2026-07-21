@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LXS — Mine</title>
+<link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html"><img src="lxs-logo.svg" alt="LXS logo">LXS</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="mine.html" class="active">Mine</a>
+      <a href="tokens.html">Tokens</a>
+      <a href="docs.html">Docs</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Mine LXS</h1>
+      <p>Point your computer at the network and earn LXS for the blocks you win. There's an easy way and a technical way — pick whichever fits you.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>Download the miner</h2>
+      <p>Grab the app for your operating system:</p>
+      <!-- ===== REAL RELEASE URLs GO HERE AT LAUNCH =====
+           Replace each href="#" below with the actual download link, e.g.
+           <MINER_DOWNLOAD_BASE_URL>/lxs-miner-macos.dmg  (see config.js: MINER_DOWNLOAD_BASE_URL)
+           ================================================ -->
+      <div class="dl-buttons">
+        <a href="#"><button>Download for macOS</button></a>
+        <a href="#"><button>Download for Windows</button></a>
+        <a href="#"><button>Download for Linux</button></a>
+      </div>
+      <p class="note">(download links added at launch)</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>The easy way</h2>
+      <p>For most people, mining is four steps:</p>
+      <ol class="steps">
+        <li><strong>Download</strong> the miner above and <strong>open</strong> it.</li>
+        <li><strong>Paste your LXS address</strong> — this is where your rewards go. Don't have one? The app can <strong>create a wallet for you</strong> and show you the address to save.</li>
+        <li>Click <strong>Mine</strong>.</li>
+        <li><strong>Watch your balance</strong> — it goes up each time your computer wins a block.</li>
+      </ol>
+      <div class="callout"><strong>Heads up — rewards are lumpy.</strong> You earn <strong>50 LXS all at once</strong> each time <em>you</em> win a block, not a steady trickle. Some days you win a few, some days none. That's normal proof-of-work.</div>
+    </section>
+
+    <section class="section card prose">
+      <h2>The technical way</h2>
+      <p>Advanced users can run the node directly from the binary or source. Get it from the repo: <a href="https://github.com/LXS-NETWORK/LXS">github.com/LXS-NETWORK/LXS</a>.</p>
+      <pre><code>lxs mine -coinbase &lt;YOUR_ADDRESS&gt; -bootstrap &lt;SEED&gt; -genesis genesis.json -p2p-port 30303</code></pre>
+      <p>What each flag does:</p>
+      <ul>
+        <li><code>-coinbase &lt;YOUR_ADDRESS&gt;</code> — the address that receives your block rewards.</li>
+        <li><code>-bootstrap &lt;SEED&gt;</code> — a seed peer to join the network through (how your node finds others).</li>
+        <li><code>-genesis genesis.json</code> — the genesis file that defines the chain you're joining.</li>
+        <li><code>-p2p-port 30303</code> — the port your node listens on for peer connections.</li>
+      </ul>
+      <p class="note">Once running, your node syncs with peers and starts mining to your coinbase address — same rewards, just from the command line.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Mining secures LXS and is how new coins enter circulation. Rewards depend on luck and total
+    network hashrate — we make no promises about how much you'll earn.</p>
+  </footer>
+</body>
+</html>
