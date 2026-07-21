@@ -13,7 +13,7 @@ window.LXS_CONFIG = {
   CHAIN_ID: 22540,                         // LXS mainnet
 
   // Deployed PumpFactory (launchpad) contract address.
-  FACTORY_ADDRESS: "",                     // FILLED IN AT LAUNCH — 0x… of the PumpFactory
+  FACTORY_ADDRESS: "0xff2829484cb09c3e48f6371021de0c87964c7b2d",                     // FILLED IN AT LAUNCH — 0x… of the PumpFactory
 
   // Free-gas faucet endpoint. Leave "" to default to RPC_URL + "/faucet".
   FAUCET_URL: "",                          // FILLED IN AT LAUNCH (optional)
