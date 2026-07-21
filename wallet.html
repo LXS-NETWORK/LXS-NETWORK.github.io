@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LXS Wallet</title>
+<meta name="theme-color" content="#0b0d12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LXS Wallet">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{
+    --bg:#0b0d12; --card:#151924; --card2:#1a1f2c; --line:#262c3a; --line2:#313848;
+    --text:#e9edf5; --dim:#8b93a7; --accent:#46e5a1; --accent2:#3aa0ff; --bad:#ff6b6b;
+    --grad:linear-gradient(100deg,#46e5a1,#3aa0ff);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;color:var(--text);min-height:100vh;
+    background:radial-gradient(700px 400px at 80% -10%,rgba(58,160,255,.12),transparent 60%),
+      radial-gradient(600px 360px at 0% 0%,rgba(70,229,161,.09),transparent 55%),var(--bg);
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;}
+  .app{max-width:440px;margin:0 auto;padding:22px 18px calc(30px + env(safe-area-inset-bottom));}
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+  .top img{width:34px;height:34px;filter:drop-shadow(0 2px 8px rgba(58,160,255,.4));}
+  .top .t{font-weight:800;font-size:20px;letter-spacing:-.4px;}
+  .top .t span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .top a{margin-left:auto;color:var(--dim);text-decoration:none;font-size:13px;}
+  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 40px -12px rgba(0,0,0,.6);}
+  h2{margin:0 0 6px;font-size:20px;letter-spacing:-.3px;}
+  p.sub{color:var(--dim);margin:0 0 18px;font-size:14px;}
+  label{display:block;font-size:13px;color:var(--dim);margin:14px 0 6px;}
+  input,textarea{width:100%;background:#0e1118;border:1px solid var(--line);color:var(--text);
+    padding:13px 14px;border-radius:12px;font-size:16px;outline:none;transition:border-color .15s,box-shadow .15s;}
+  input:focus,textarea:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(58,160,255,.15);}
+  textarea{resize:vertical;min-height:70px;font-family:ui-monospace,monospace;font-size:14px;}
+  button{width:100%;background:var(--grad);color:#04241a;border:0;padding:14px;border-radius:13px;
+    font-weight:800;font-size:16px;cursor:pointer;margin-top:16px;box-shadow:0 6px 20px -8px rgba(70,229,161,.5);
+    transition:transform .12s,filter .12s;}
+  button:active{transform:translateY(1px);}
+  button.ghost{background:transparent;color:var(--text);border:1px solid var(--line2);box-shadow:none;}
+  button.sm{width:auto;padding:9px 14px;font-size:13px;font-weight:700;margin:0;}
+  .row{display:flex;gap:10px;}
+  .row button{margin-top:0;}
+  .wmsg{margin-top:14px;font-size:14px;min-height:20px;word-break:break-word;}
+  .wmsg.ok{color:var(--accent);} .wmsg.err{color:var(--bad);}
+  .mono{font-family:ui-monospace,monospace;font-size:13px;word-break:break-all;color:var(--text);}
+  .phrase{background:#0e1118;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:8px;
+    font-family:ui-monospace,monospace;font-size:15px;line-height:1.7;color:var(--accent);word-spacing:4px;}
+  .warn{border-left:3px solid var(--bad);background:rgba(255,107,107,.07);border-radius:10px;padding:12px 14px;margin:14px 0;font-size:13px;color:var(--dim);}
+  .warn strong{color:var(--text);}
+  .chk{display:flex;align-items:flex-start;gap:9px;margin-top:14px;font-size:13px;color:var(--dim);}
+  .chk input{width:auto;margin-top:2px;}
+  .bal{text-align:center;padding:8px 0 6px;}
+  .bal .n{font-size:44px;font-weight:850;letter-spacing:-1.5px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .bal .u{color:var(--dim);font-size:14px;margin-top:-4px;}
+  .addr{display:flex;align-items:center;gap:8px;background:#0e1118;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:8px;}
+  .addr .a{flex:1;min-width:0;font-family:ui-monospace,monospace;font-size:13px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;}
+  .sec{background:#0e1118;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;font-family:ui-monospace,monospace;font-size:12px;color:var(--bad);word-break:break-all;}
+  .divider{height:1px;background:var(--line);margin:20px 0;}
+  .foot{text-align:center;margin-top:18px;color:var(--dim);font-size:12px;}
+  .foot a{color:var(--accent2);text-decoration:none;}
+  .linkbtn{background:none;border:0;color:var(--dim);font-size:13px;width:auto;padding:6px;margin:0;box-shadow:none;cursor:pointer;text-decoration:underline;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <img src="lxs-logo.svg" alt="LXS">
+      <div class="t"><span>LXS</span> Wallet</div>
+      <a href="index.html">Website ↗</a>
+    </div>
+
+    <!-- SETUP -->
+    <div id="screen-setup" class="card" style="display:none">
+      <h2>Your LXS wallet</h2>
+      <p class="sub">Non-custodial — your key stays on this device, encrypted with your password. No account, no email.</p>
+      <button id="btn-create">Create a new wallet</button>
+      <button id="btn-import" class="ghost">Import an existing wallet</button>
+      <p class="foot">Add this page to your Home Screen to use it like an app.</p>
+    </div>
+
+    <!-- CREATE -->
+    <div id="screen-create" class="card" style="display:none">
+      <h2>New wallet</h2>
+      <p class="sub">Write down your recovery phrase and keep it safe. It is the ONLY way to restore your coins.</p>
+      <label>Your address</label>
+      <div class="mono" id="create-address">—</div>
+      <label>Recovery phrase (12 words)</label>
+      <div class="phrase" id="create-mnemonic">—</div>
+      <div class="warn"><strong>Save these 12 words offline.</strong> Anyone who has them controls your coins. We cannot recover them for you.</div>
+      <label>Set a password (unlocks this wallet on this device)</label>
+      <input id="create-pw" type="password" placeholder="At least 8 characters" autocomplete="new-password">
+      <input id="create-pw2" type="password" placeholder="Repeat password" autocomplete="new-password" style="margin-top:8px">
+      <label class="chk"><input id="create-backup" type="checkbox"> I have written down my 12-word recovery phrase.</label>
+      <button id="btn-confirm-create">Create wallet</button>
+      <div class="wmsg" id="create-msg"></div>
+      <button class="linkbtn back-setup">← Back</button>
+    </div>
+
+    <!-- IMPORT -->
+    <div id="screen-import" class="card" style="display:none">
+      <h2>Import wallet</h2>
+      <p class="sub">Paste your 12-word recovery phrase, or a private key (0x…).</p>
+      <label>Recovery phrase or private key</label>
+      <textarea id="import-secret" placeholder="word1 word2 …   or   0x…" autocomplete="off"></textarea>
+      <label>Set a password (unlocks this wallet on this device)</label>
+      <input id="import-pw" type="password" placeholder="At least 8 characters" autocomplete="new-password">
+      <button id="btn-confirm-import">Import wallet</button>
+      <div class="wmsg" id="import-msg"></div>
+      <button class="linkbtn back-setup">← Back</button>
+    </div>
+
+    <!-- UNLOCK -->
+    <div id="screen-unlock" class="card" style="display:none">
+      <h2>Welcome back</h2>
+      <p class="sub">Enter your password to unlock your LXS wallet.</p>
+      <input id="unlock-pw" type="password" placeholder="Password" autocomplete="current-password">
+      <button id="btn-unlock">Unlock</button>
+      <div class="wmsg" id="unlock-msg"></div>
+      <button class="linkbtn btn-remove">Forget wallet on this device</button>
+    </div>
+
+    <!-- HOME -->
+    <div id="screen-home" style="display:none">
+      <div class="card">
+        <div class="bal">
+          <div class="n"><span id="home-balance">…</span></div>
+          <div class="u">LXS</div>
+        </div>
+        <div class="addr">
+          <div class="a" id="home-address">—</div>
+          <button id="btn-copy" class="ghost sm">Copy</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button id="btn-refresh" class="ghost sm">↻ Refresh</button>
+          <button id="btn-getgas" class="ghost sm">Get free gas</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h2 style="font-size:17px">Send LXS</h2>
+        <label>To address</label>
+        <input id="send-to" placeholder="0x…" autocomplete="off" spellcheck="false">
+        <label>Amount (LXS)</label>
+        <input id="send-amount" type="number" inputmode="decimal" placeholder="0.0" step="0.000001" min="0">
+        <button id="btn-send">Send</button>
+        <div class="wmsg" id="home-msg"></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="grid2">
+          <button id="btn-reveal" class="ghost sm">Show private key</button>
+          <button id="btn-lock" class="ghost sm">Lock</button>
+        </div>
+        <div class="sec" id="home-secret"></div>
+        <button class="linkbtn btn-remove" style="margin-top:12px">Forget wallet on this device</button>
+      </div>
+
+      <p class="foot">Non-custodial · your key never leaves this device · <a href="index.html">LXS website</a></p>
+    </div>
+  </div>
+
+  <script src="ethers.umd.min.js"></script>
+  <script src="wallet.js"></script>
+</body>
+</html>
