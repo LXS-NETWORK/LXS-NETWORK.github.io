@@ -41,16 +41,25 @@
       <p>For most people, mining is four steps:</p>
       <ol class="steps">
         <li><strong>Download</strong> the miner above and <strong>open</strong> it.</li>
+        <li><strong>Pick pool or solo</strong> — the app asks first. Not sure? Pick <strong>pool</strong>.</li>
         <li><strong>Paste your LXS address</strong> — this is where your rewards go. Don't have one? The app can <strong>create a wallet for you</strong> and show you the address to save.</li>
-        <li>Click <strong>Mine</strong>.</li>
-        <li><strong>Watch your balance</strong> — it goes up each time your computer wins a block.</li>
+        <li><strong>Watch your balance</strong> — it grows as you mine.</li>
       </ol>
-      <div class="callout"><strong>Heads up — rewards are lumpy.</strong> You earn <strong>50 LXS all at once</strong> each time <em>you</em> win a block, not a steady trickle. Some days you win a few, some days none. That's normal proof-of-work.</div>
+    </section>
+
+    <section class="section card prose">
+      <h2>Pool or solo?</h2>
+      <p><strong>Pool mining (recommended)</strong> — everyone's computers work as one team. When the pool wins a block, the <strong>50 LXS is split among the miners in proportion to the work each one contributed</strong>, and paid to your wallet automatically. A normal laptop earns a little on every pool block instead of waiting to win one alone — steady income, small slices.</p>
+      <p><strong>Solo mining</strong> — your machine competes by itself. You keep the <strong>whole 50 LXS</strong> each time <em>you</em> win a block — but only then. Rewards are lumpy: some days a few, some days none. That's normal proof-of-work, and the right choice for powerful hardware.</p>
+      <div class="callout"><strong>Honest note:</strong> pool payouts wait ~50 minutes (12 blocks) before paying, so a chain reorganisation can't pay out coins the pool never got. The pool takes <strong>0% fee</strong> — the whole reward goes to the miners.</div>
     </section>
 
     <section class="section card prose">
       <h2>The technical way</h2>
       <p>Advanced users can run the node directly from the binary or source. Get it from the repo: <a href="https://github.com/LXS-NETWORK/LXS">github.com/LXS-NETWORK/LXS</a>.</p>
+      <p>Pool mining (no sync, no datadir needed — just hash and get paid):</p>
+      <pre><code>lxs mine -pool https://lxsnetwork.duckdns.org -coinbase &lt;YOUR_ADDRESS&gt;</code></pre>
+      <p>Solo mining (runs a full node):</p>
       <pre><code>lxs mine -coinbase &lt;YOUR_ADDRESS&gt; -genesis lxs-genesis.json -p2p-port 30303 \
   -bootstrap /ip4/79.72.25.166/tcp/30303/p2p/12D3KooWRSSSocSqWG978SWKpimQsti4WkmjytQX7g1qgJKnNzuA</code></pre>
       <p>The <code>lxs-genesis.json</code> file ships inside every download above. The built-in binary already knows the seed, so <code>-bootstrap</code> is optional — the flag is shown for clarity.</p>
