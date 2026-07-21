@@ -27,16 +27,12 @@
     <section class="section card prose">
       <h2>Download the miner</h2>
       <p>Grab the app for your operating system:</p>
-      <!-- ===== REAL RELEASE URLs GO HERE AT LAUNCH =====
-           Replace each href="#" below with the actual download link, e.g.
-           <MINER_DOWNLOAD_BASE_URL>/lxs-miner-macos.dmg  (see config.js: MINER_DOWNLOAD_BASE_URL)
-           ================================================ -->
       <div class="dl-buttons">
-        <a href="#"><button>Download for macOS</button></a>
-        <a href="#"><button>Download for Windows</button></a>
-        <a href="#"><button>Download for Linux</button></a>
+        <a href="https://github.com/LXS-NETWORK/LXS/releases/latest/download/lxs-miner-mac.zip"><button>Download for macOS</button></a>
+        <a href="https://github.com/LXS-NETWORK/LXS/releases/latest/download/lxs-miner-windows.zip"><button>Download for Windows</button></a>
+        <a href="https://github.com/LXS-NETWORK/LXS/releases/latest/download/lxs-miner-linux.zip"><button>Download for Linux</button></a>
       </div>
-      <p class="note">(download links added at launch)</p>
+      <p class="note">Unzip and run the launcher inside (START-MINING). It asks for your address — paste one, or press Enter to create a wallet. Windows/macOS may warn about an unsigned app; the folder's READ-ME-FIRST explains the one click to allow it.</p>
     </section>
 
     <section class="section card prose">
@@ -54,7 +50,9 @@
     <section class="section card prose">
       <h2>The technical way</h2>
       <p>Advanced users can run the node directly from the binary or source. Get it from the repo: <a href="https://github.com/LXS-NETWORK/LXS">github.com/LXS-NETWORK/LXS</a>.</p>
-      <pre><code>lxs mine -coinbase &lt;YOUR_ADDRESS&gt; -bootstrap &lt;SEED&gt; -genesis genesis.json -p2p-port 30303</code></pre>
+      <pre><code>lxs mine -coinbase &lt;YOUR_ADDRESS&gt; -genesis lxs-genesis.json -p2p-port 30303 \
+  -bootstrap /ip4/79.72.25.166/tcp/30303/p2p/12D3KooWRSSSocSqWG978SWKpimQsti4WkmjytQX7g1qgJKnNzuA</code></pre>
+      <p>The <code>lxs-genesis.json</code> file ships inside every download above. The built-in binary already knows the seed, so <code>-bootstrap</code> is optional — the flag is shown for clarity.</p>
       <p>What each flag does:</p>
       <ul>
         <li><code>-coinbase &lt;YOUR_ADDRESS&gt;</code> — the address that receives your block rewards.</li>
