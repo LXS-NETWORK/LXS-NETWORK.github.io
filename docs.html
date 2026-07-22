@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LXS — How it works</title>
+<title>LXS — How it works (docs)</title>
+<meta name="description" content="Everything about LXS in plain language: what it is, proof-of-work mining, tokenomics and the disclosed founder allocation, the mining pool, tokens, the faucet, and how to verify it all yourself.">
 <link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -16,40 +17,62 @@
       <a href="tokens.html">Tokens</a>
       <a href="wallet.html">Wallet</a>
       <a href="docs.html" class="active">Docs</a>
+      <a href="faq.html">FAQ</a>
     </nav>
   </header>
 
   <main>
     <section class="hero">
       <h1>How it works</h1>
-      <p>Everything about LXS, in plain language — what it is, how the coins are created, how to connect it, how mining works, and how tokens live on the chain.</p>
+      <p>Everything about LXS, in plain language — what it is, how coins are created, how mining and the pool work, how tokens live on the chain, and how to verify all of it yourself. Prefer quick answers? Jump to the <a href="faq.html">FAQ</a>.</p>
     </section>
 
     <section class="section card prose">
       <h2>What is LXS?</h2>
-      <p>LXS is a <strong>proof-of-work layer-1 blockchain</strong> — its own independent network, like Bitcoin, not a token on someone else's chain. Coins are created only by <strong>mining</strong>, so there's no hidden faucet of insider coins. Anyone can run the software, mine the coin, launch a token, and send value, without asking permission.</p>
-      <p>The website you're reading is just a convenient window. The real network is the thousands of blocks and the nodes that hold them — it keeps running with or without this page.</p>
+      <p>LXS is a <strong>proof-of-work Layer-1 blockchain</strong> — its own independent network, like Bitcoin, not a token on someone else's chain. Coins are created only by <strong>mining</strong>, so there's no hidden faucet of insider coins. Anyone can run the software, mine the coin, launch a token, and send value, without asking permission.</p>
+      <p>If you know Bitcoin, LXS will feel familiar: the same idea of a coin <strong>earned with real work</strong> and secured by miners, with no company in the middle. What LXS adds is a <strong>one-click token launchpad</strong>, so any community can create and trade its own token on top of the chain. The website you're reading is just a convenient window — the real network is the blocks and the nodes that hold them, and it keeps running with or without this page.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>How mining works</h2>
+      <p>Mining is the process of <strong>spending computing power to confirm transactions, secure the network, and keep everyone in agreement</strong> — without any central authority. Miners race to solve a hard puzzle; the first to solve it adds the next block and collects its reward. Rewriting history would mean out-working the entire honest network at once, which is what makes the chain secure.</p>
+      <p>You mine by running the miner app (see the <a href="mine.html">Mine</a> page) — on an ordinary CPU, no special hardware. Nodes find each other through a <strong>distributed peer directory (DHT)</strong>, so there's no central server to shut down: the network keeps going as long as anyone, anywhere, is running a node. New here? You can start mining without understanding any of the technical details.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>The mining pool</h2>
+      <p>Finding a block solo is like a lottery — rare, but the whole 50 LXS is yours. A <strong>pool</strong> is a group of miners who combine their computing power and share the rewards fairly, so everyone gets steady payouts instead of waiting for a rare solo win.</p>
+      <p>When you pool-mine, your machine submits <strong>shares</strong> — proof that it's doing real work toward finding a block. When the pool wins a block, the reward is split <strong>in proportion to the shares each miner contributed</strong> (a scheme called PPLNS), and paid to your wallet automatically. The LXS pool charges <strong>0% fee</strong>, and payouts wait about 50 minutes (12 blocks) to mature so a chain reorganisation can't pay out a reward the pool never received. Connect with <code>lxs mine -pool &lt;url&gt;</code> or just pick “pool” in the miner app.</p>
     </section>
 
     <section class="section card prose">
       <h2>Tokenomics</h2>
       <ul>
-        <li><strong>50 LXS per block</strong> is paid to the miner who wins it.</li>
-        <li>The reward <strong>halves every 1,000,000 blocks</strong> — roughly one era every <strong>~7.6 years</strong> — so issuance slows down over time.</li>
-        <li>About <strong>100 million LXS</strong> is mined out over roughly <strong>500 years</strong>, plus a <strong>20 million</strong> genesis allocation, for a maximum of about <strong>120 million LXS</strong>.</li>
-        <li><strong>20% of transaction fees are burned</strong> (destroyed), and the rest go to miners.</li>
+        <li><strong>50 LXS per block</strong> goes to the miner who wins it (in a pool, split by contributed work).</li>
+        <li>The reward <strong>halves every 1,000,000 blocks</strong> — roughly one era every <strong>~7.6 years</strong> — so issuance slows predictably over time. No one can change this.</li>
+        <li>About <strong>100 million LXS</strong> is mined out over roughly <strong>500 years</strong>, plus a <strong>20 million</strong> genesis allocation to the founder, for a maximum of about <strong>120 million LXS</strong>.</li>
+        <li><strong>20% of every transaction fee is burned</strong> (destroyed forever); the rest goes to miners.</li>
       </ul>
-      <p>Fees reward the people doing the work of securing the chain; the burn slowly removes coins from supply. No part of this promises a price — it just describes how coins enter and leave circulation.</p>
+      <p>New LXS is created at a decreasing, predictable rate that no one can alter. Fees reward the people securing the chain; the burn slowly removes coins from supply. None of this promises a price — it just describes exactly how coins enter and leave circulation.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>The founder allocation, disclosed</h2>
+      <p>Being upfront is the whole point, so here it is plainly: <strong>20,000,000 LXS were created at genesis for the founder</strong>. There was <strong>no presale, no ICO, no VC round, and no whitelist</strong> — everything beyond that founder allocation is mined, in the open, by whoever shows up.</p>
+      <p>That allocation is fixed and visible on-chain. As ~100M more LXS is mined over the coming centuries, the founder's share becomes a smaller and smaller fraction of the total. We don't claim to be premine-free — we claim to be honest about it, and to give everyone the same rules from here on. You can look the founder address up yourself:</p>
+      <div class="kv">
+        <div><span class="k">Founder address</span><span class="v">0xf5f8d308fa24a03485829c3bc21a95dbfa74a418</span></div>
+        <div><span class="k">Genesis allocation</span><span class="v">20,000,000 LXS</span></div>
+      </div>
     </section>
 
     <section class="section card prose">
       <h2>Add LXS to MetaMask</h2>
       <p>On the <a href="tokens.html">Tokens</a> page you can click <strong>“Add LXS network”</strong> to do this automatically. To add it by hand, open MetaMask → Networks → Add network → Add manually, and enter:</p>
-      <!-- ===== FILLED IN AT LAUNCH — keep these in sync with config.js (RPC_URL, CHAIN_ID) ===== -->
       <div class="kv">
         <div><span class="k">Network name</span><span class="v">LXS</span></div>
-        <div><span class="k">RPC URL</span><span class="v">&lt;RPC_URL&gt;</span></div>
-        <div><span class="k">Chain ID</span><span class="v">&lt;CHAIN_ID&gt;</span></div>
+        <div><span class="k">RPC URL</span><span class="v">https://lxsnetwork.duckdns.org</span></div>
+        <div><span class="k">Chain ID</span><span class="v">22540</span></div>
         <div><span class="k">Currency symbol</span><span class="v">LXS</span></div>
       </div>
       <ol class="steps">
@@ -61,12 +84,6 @@
     </section>
 
     <section class="section card prose">
-      <h2>How mining works</h2>
-      <p>LXS uses <strong>proof-of-work</strong>: miners race to solve a hard math puzzle, and the first to solve it gets to add the next block and collect its reward. This is what secures the chain — rewriting history would mean out-working the entire honest network.</p>
-      <p>You mine by <strong>running a node</strong> (see the <a href="mine.html">Mine</a> page). Nodes find each other through a <strong>DHT</strong> (a distributed peer directory), so the network is decentralized: there's no central server to shut down, and it keeps going as long as anyone, anywhere, is running a node.</p>
-    </section>
-
-    <section class="section card prose">
       <h2>How tokens work</h2>
       <p>A token you launch is an <strong>on-chain smart contract</strong>. Once created, it lives on the blockchain and is replicated across <strong>every node</strong> — it is not stored on any website or company server. The <a href="tokens.html">Tokens</a> page just reads it from the chain and draws it for you.</p>
       <p>Every new token is instantly tradeable on a <strong>bonding curve</strong>: the contract itself sets the price and lets anyone buy or sell with LXS, so there's no need for upfront liquidity or a listing. Because the token lives on-chain, it stays alive even if this website disappears.</p>
@@ -74,7 +91,28 @@
 
     <section class="section card prose">
       <h2>The free-gas faucet</h2>
-      <p>Doing anything on-chain (like creating your first token) costs a tiny amount of LXS for <strong>gas</strong>. A brand-new wallet has zero. So new users can click <strong>“Get LXS for gas (free)”</strong> on the Tokens page to claim a small amount — just enough to afford that first action. One claim per address.</p>
+      <p>Doing anything on-chain (like creating your first token) costs a tiny amount of LXS for <strong>gas</strong>. A brand-new wallet has zero, so new users can click <strong>“Get LXS for gas (free)”</strong> on the Tokens page to claim a small amount — just enough to afford that first action. One claim per address.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>Verify it yourself</h2>
+      <p>You don't have to trust this website. Everything about LXS is open and checkable:</p>
+      <ul>
+        <li><strong>Read the code.</strong> The full node, miner, launchpad, and pool are open-source at <a href="https://github.com/LXS-NETWORK/LXS">github.com/LXS-NETWORK/LXS</a>.</li>
+        <li><strong>Run a node.</strong> Download the same binary everyone else runs, join the network, and see the chain for yourself — you don't have to trust anyone's copy.</li>
+        <li><strong>Check the balances.</strong> Add LXS to MetaMask and look up any address, including the founder wallet above.</li>
+        <li><strong>Mine a block.</strong> The surest proof the network is real and open is to earn a coin from it yourself.</li>
+      </ul>
+    </section>
+
+    <section class="section card prose">
+      <h2>Keep your coins safe</h2>
+      <p>LXS is <strong>non-custodial</strong>: your key lives on your device, not on a server. That means you're in control — and also responsible. Whoever holds your recovery phrase or private key owns your coins, and no one can recover them for you.</p>
+      <ul>
+        <li><strong>Back up your recovery phrase offline</strong> and never share it. No real LXS tool will ever ask for it.</li>
+        <li><strong>Ignore anyone promising guaranteed returns</strong> or “doubling” your LXS — that's how every crypto scam starts.</li>
+        <li><strong>Double-check addresses</strong> before sending; on-chain transfers can't be reversed.</li>
+      </ul>
     </section>
   </main>
 
@@ -86,6 +124,8 @@
         <a href="tokens.html">Tokens</a>
         <a href="wallet.html">Wallet</a>
         <a href="docs.html">Docs</a>
+        <a href="faq.html">FAQ</a>
+        <a href="roadmap.html">Roadmap</a>
         <a href="https://github.com/LXS-NETWORK/LXS">GitHub</a>
       </nav>
       <p>An open, mined, community-run blockchain. Your keys never leave your device. Not financial advice.</p>

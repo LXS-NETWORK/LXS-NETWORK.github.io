@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LXS — Frequently asked questions</title>
+<meta name="description" content="Straight answers about LXS: who runs it, the disclosed founder allocation, whether it's a scam, how to mine, tokenomics, and how to verify everything yourself.">
+<link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html"><img src="lxs-logo.svg" alt="LXS logo">LXS</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="mine.html">Mine</a>
+      <a href="tokens.html">Tokens</a>
+      <a href="wallet.html">Wallet</a>
+      <a href="docs.html">Docs</a>
+      <a href="faq.html" class="active">FAQ</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Frequently asked questions</h1>
+      <p>Straight answers, including the awkward ones. Crypto has more than its share of jargon and hype — here we'd rather be clear and honest than impressive.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>About LXS</h2>
+
+      <h3>What is LXS?</h3>
+      <p>An open, proof-of-work Layer-1 blockchain you can mine from your own computer. New coins come out of mining only, like Bitcoin. On top of the chain, anyone can launch a token in one click. No company owns it.</p>
+
+      <h3>Who created LXS and who runs it?</h3>
+      <p>LXS was started by a solo founder (the “founder wallet” you'll see referenced is theirs). But <strong>no one controls the network</strong> — much like no one owns email. It's run by everyone who mines it and runs a node. Anyone can join, and no one can be shut out.</p>
+
+      <h3>Is there a company or foundation behind LXS?</h3>
+      <p>No corporation, no VC, no foundation with a treasury of insider tokens. There's a founder and a growing community, and that's it. We'd rather tell you that plainly than dress it up.</p>
+
+      <h3>Do I need to be technical to use LXS?</h3>
+      <p>No. You can get a wallet, mine, and send LXS without understanding the technical details. The <a href="mine.html">miner app</a> and <a href="wallet.html">wallet</a> are built for normal people.</p>
+
+      <h3>Why should I trust LXS?</h3>
+      <p>You shouldn't have to. Everything is open-source and verifiable: read the <a href="https://github.com/LXS-NETWORK/LXS">code</a>, run a node, check any balance on-chain, and mine a coin yourself. Trust is replaced by things you can check.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>Fair launch &amp; tokenomics</h2>
+
+      <h3>Was there a presale or ICO?</h3>
+      <p>No presale, no ICO, no private sale, no VC round, no whitelist. From the very first block, anyone with a computer could mine LXS on equal terms.</p>
+
+      <h3>Is there a premine? How big is it?</h3>
+      <p>Yes — and we won't hide it. <strong>20,000,000 LXS</strong> were created at genesis for the founder. It sits at a public address (<span class="dim">0xf5f8d308fa24a03485829c3bc21a95dbfa74a418</span>) you can look up. Everything else is mined.</p>
+
+      <h3>Doesn't the founder premine make this unfair?</h3>
+      <p>It's a fair question, so here's the honest answer: the founder allocation is <strong>fixed, small, and disclosed</strong>. Around 100M more LXS is mined by the community over roughly 500 years, so the founder's 20M becomes a shrinking share of supply over time. There was no presale and no insider round — beyond that one disclosed allocation, every coin is earned in the open. Compare that to hiding a premine and calling it a “fair launch”; we'd rather just be straight with you.</p>
+
+      <h3>How is new LXS created?</h3>
+      <p>Only by mining. Each block pays 50 LXS to the miner who wins it, at a rate that halves every 1,000,000 blocks — a decreasing, predictable schedule no one can change.</p>
+
+      <h3>What's the total supply and emission schedule?</h3>
+      <p>20,000,000 at genesis plus about 100,000,000 mined over ~500 years — roughly <strong>120,000,000 LXS</strong> maximum. Block reward starts at 50, blocks come about every 4 minutes, and the reward halves every 1,000,000 blocks.</p>
+
+      <h3>What is the fee burn?</h3>
+      <p>20% of every transaction fee is <strong>burned</strong> — destroyed forever, removed from supply. The other 80% goes to the miner who secured the block.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>Mining</h2>
+
+      <h3>Can I mine LXS? What do I need?</h3>
+      <p>Yes, anyone can. You need a computer (a normal CPU is fine — no GPU or ASIC required) and an LXS address. Download the <a href="mine.html">miner</a>, paste your address, and go.</p>
+
+      <h3>Solo or pool — which should I choose?</h3>
+      <p>If you're mining at home, a <strong>pool</strong> is usually better: steady, small payouts proportional to your work, instead of gambling on a rare solo jackpot. Solo keeps the whole 50 LXS per block, but only when you win one — better for powerful hardware. See the <a href="mine.html">Mine</a> page for a side-by-side.</p>
+
+      <h3>How do I join the mining pool?</h3>
+      <p>Pick “pool” when you start the miner app, or run <code>lxs mine -pool https://lxsnetwork.duckdns.org -coinbase &lt;YOUR_ADDRESS&gt;</code>. Payouts are automatic once blocks mature (~50 minutes), at 0% pool fee.</p>
+
+      <h3>Isn't proof-of-work a waste of energy?</h3>
+      <p>Proof-of-work spends energy on purpose — that real-world cost is exactly what makes the chain expensive to attack and impossible to fake. Miners naturally seek the cheapest power they can find. It's the same mechanism that has secured Bitcoin for over a decade.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>Value, risk &amp; safety</h2>
+
+      <h3>Why does LXS have value? Can it become worthless?</h3>
+      <p>Honestly: LXS is worth whatever people who use it decide it's worth — from mining it, building on it, and trading it. Scarcity and real work support it, but nothing guarantees a price, and yes, like any early crypto it could go to nothing. We make <strong>no promises of profit</strong>. If anyone tells you otherwise, don't believe them.</p>
+
+      <h3>Is this a scam?</h3>
+      <p>The things scams do — hidden premines, fake partners, guaranteed returns, pressure to buy now — are the opposite of how LXS is run. We disclose the founder allocation, publish the code, promise no returns, and let you verify everything yourself. Judge it by what you can check, not by our word.</p>
+
+      <h3>What happens if I lose my recovery phrase or private key?</h3>
+      <p>Your coins are gone, and no one can recover them — that's the price of true, non-custodial ownership. Back up your recovery phrase offline, keep it private, and never type it into anything that asks for it unexpectedly.</p>
+
+      <h3>What if the founder disappears?</h3>
+      <p>The network keeps running. It's open-source and run by its miners and nodes — that's the whole point of proof-of-work. Anyone can keep mining, run a seed, and use the chain with or without any single person.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>Still have a question?</h2>
+      <p>Read the <a href="docs.html">docs</a> for the deeper explanation, or dig into the open-source <a href="https://github.com/LXS-NETWORK/LXS">code</a>. The best way to understand LXS is to <a href="mine.html">mine a block</a> or <a href="tokens.html">launch a token</a> yourself.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="foot-inner">
+      <nav class="foot-nav">
+        <a href="index.html">Home</a>
+        <a href="mine.html">Mine</a>
+        <a href="tokens.html">Tokens</a>
+        <a href="wallet.html">Wallet</a>
+        <a href="docs.html">Docs</a>
+        <a href="faq.html">FAQ</a>
+        <a href="roadmap.html">Roadmap</a>
+        <a href="https://github.com/LXS-NETWORK/LXS">GitHub</a>
+      </nav>
+      <p>Honest answers, no promises of profit. Verify everything yourself. Not financial advice.</p>
+    </div>
+  </footer>
+</body>
+</html>

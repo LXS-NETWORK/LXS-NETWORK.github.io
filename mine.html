@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LXS — Mine</title>
+<title>LXS — Mine LXS on a normal computer</title>
+<meta name="description" content="Anyone can mine LXS. Download the miner, pick pool or solo, paste your address, and earn LXS for helping run the network. No special hardware needed.">
 <link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -16,61 +17,89 @@
       <a href="tokens.html">Tokens</a>
       <a href="wallet.html">Wallet</a>
       <a href="docs.html">Docs</a>
+      <a href="faq.html">FAQ</a>
     </nav>
   </header>
 
   <main>
     <section class="hero">
       <h1>Mine LXS</h1>
-      <p>Point your computer at the network and earn LXS for the blocks you win. There's an easy way and a technical way — pick whichever fits you.</p>
+      <p>Anyone can mine LXS. You don't need to be technical, you don't need special hardware, and you don't need permission — just a computer and a wallet address. Mining is how new LXS is created and how the network stays secure. Do the work, earn the coin.</p>
     </section>
 
     <section class="section card prose">
       <h2>Download the miner</h2>
-      <p>Grab the app for your operating system:</p>
+      <p>Grab the app for your operating system, unzip it, and run the launcher inside (<strong>START-MINING</strong>). It asks two things: <strong>pool or solo</strong>, and <strong>your address</strong> — paste one, or press Enter and it creates a wallet for you.</p>
       <div class="dl-buttons">
         <a href="https://github.com/LXS-NETWORK/LXS/releases/latest/download/lxs-miner-mac.zip"><button>Download for macOS</button></a>
         <a href="https://github.com/LXS-NETWORK/LXS/releases/latest/download/lxs-miner-windows.zip"><button>Download for Windows</button></a>
         <a href="https://github.com/LXS-NETWORK/LXS/releases/latest/download/lxs-miner-linux.zip"><button>Download for Linux</button></a>
       </div>
-      <p class="note">Unzip and run the launcher inside (START-MINING). It asks for your address — paste one, or press Enter to create a wallet. Windows/macOS may warn about an unsigned app; the folder's READ-ME-FIRST explains the one click to allow it.</p>
+      <p class="note">Windows/macOS may warn about an unsigned app the first time — the folder's READ-ME-FIRST explains the one click to allow it. The app is open-source; you can build it yourself from the <a href="https://github.com/LXS-NETWORK/LXS">repo</a>.</p>
     </section>
 
     <section class="section card prose">
-      <h2>The easy way</h2>
-      <p>For most people, mining is four steps:</p>
+      <h2>Four steps to your first block</h2>
       <ol class="steps">
-        <li><strong>Download</strong> the miner above and <strong>open</strong> it.</li>
-        <li><strong>Pick pool or solo</strong> — the app asks first. Not sure? Pick <strong>pool</strong>.</li>
-        <li><strong>Paste your LXS address</strong> — this is where your rewards go. Don't have one? The app can <strong>create a wallet for you</strong> and show you the address to save.</li>
-        <li><strong>Watch your balance</strong> — it grows as you mine.</li>
+        <li><strong>Download and open</strong> the miner above.</li>
+        <li><strong>Choose pool or solo.</strong> Not sure? Choose <strong>pool</strong> — it pays steady. (More on the difference below.)</li>
+        <li><strong>Paste your LXS address</strong> — where your rewards go. No address? Press Enter and the app makes a wallet and shows you the address to back up.</li>
+        <li><strong>Watch it work.</strong> In pool mode you'll see <em>“share accepted”</em> as your work is counted; in solo mode you'll see <em>“mined block”</em> when you win one. Keep the window open.</li>
       </ol>
     </section>
 
     <section class="section card prose">
       <h2>Pool or solo?</h2>
-      <p><strong>Pool mining (recommended)</strong> — everyone's computers work as one team. When the pool wins a block, the <strong>50 LXS is split among the miners in proportion to the work each one contributed</strong>, and paid to your wallet automatically. A normal laptop earns a little on every pool block instead of waiting to win one alone — steady income, small slices.</p>
-      <p><strong>Solo mining</strong> — your machine competes by itself. You keep the <strong>whole 50 LXS</strong> each time <em>you</em> win a block — but only then. Rewards are lumpy: some days a few, some days none. That's normal proof-of-work, and the right choice for powerful hardware.</p>
-      <div class="callout"><strong>Honest note:</strong> pool payouts wait ~50 minutes (12 blocks) before paying, so a chain reorganisation can't pay out coins the pool never got. The pool takes <strong>0% fee</strong> — the whole reward goes to the miners.</div>
+      <p>Both earn you real LXS — they just pay differently. Finding a block on your own is like a lottery: rare, but the whole reward is yours. A pool trades those rare jackpots for small, steady payouts.</p>
     </section>
+
+    <div class="grid">
+      <div class="card prose">
+        <h3>⛏ Pool mining <span class="dim">— recommended</span></h3>
+        <p>Everyone's computers work as one team. When the pool wins a block, the <strong>50 LXS is split among miners in proportion to the work each contributed</strong>, and paid to your wallet automatically.</p>
+        <ul>
+          <li><strong>Steady, frequent payouts</strong> — a little on every pool block instead of waiting to win one alone.</li>
+          <li><strong>Best for normal computers.</strong></li>
+          <li><strong>0% pool fee</strong> — the whole reward goes to the miners.</li>
+          <li>Payouts wait ~50 minutes (12 blocks) to mature, so a reorg can't pay out coins the pool never received.</li>
+        </ul>
+      </div>
+      <div class="card prose">
+        <h3>🎯 Solo mining</h3>
+        <p>Your machine competes by itself. You keep the <strong>whole 50 LXS</strong> each time <em>you</em> win a block — but only then.</p>
+        <ul>
+          <li><strong>Lumpy rewards</strong> — some days you win a few, some days none. That's normal proof-of-work.</li>
+          <li><strong>Best for powerful hardware.</strong></li>
+          <li>More decentralized — you build your own blocks and choose what's in them.</li>
+          <li>Runs a full node, so it also helps sync and secure the chain.</li>
+        </ul>
+      </div>
+    </div>
 
     <section class="section card prose">
       <h2>The technical way</h2>
-      <p>Advanced users can run the node directly from the binary or source. Get it from the repo: <a href="https://github.com/LXS-NETWORK/LXS">github.com/LXS-NETWORK/LXS</a>.</p>
-      <p>Pool mining (no sync, no datadir needed — just hash and get paid):</p>
+      <p>Advanced users can run it straight from the binary or source — get it from the repo: <a href="https://github.com/LXS-NETWORK/LXS">github.com/LXS-NETWORK/LXS</a>.</p>
+      <p>Pool mining (no sync, no datadir — just hash and get paid):</p>
       <pre><code>lxs mine -pool https://lxsnetwork.duckdns.org -coinbase &lt;YOUR_ADDRESS&gt;</code></pre>
       <p>Solo mining (runs a full node):</p>
       <pre><code>lxs mine -coinbase &lt;YOUR_ADDRESS&gt; -genesis lxs-genesis.json -p2p-port 30303 \
   -bootstrap /ip4/79.72.25.166/tcp/30303/p2p/12D3KooWRSSSocSqWG978SWKpimQsti4WkmjytQX7g1qgJKnNzuA</code></pre>
-      <p>The <code>lxs-genesis.json</code> file ships inside every download above. The built-in binary already knows the seed, so <code>-bootstrap</code> is optional — the flag is shown for clarity.</p>
-      <p>What each flag does:</p>
+      <p>What the flags do:</p>
       <ul>
-        <li><code>-coinbase &lt;YOUR_ADDRESS&gt;</code> — the address that receives your block rewards.</li>
+        <li><code>-pool &lt;URL&gt;</code> — mine into the pool at this address (steady, proportional payouts).</li>
+        <li><code>-coinbase &lt;YOUR_ADDRESS&gt;</code> — the address that receives your rewards.</li>
         <li><code>-bootstrap &lt;SEED&gt;</code> — a seed peer to join the network through (how your node finds others).</li>
-        <li><code>-genesis genesis.json</code> — the genesis file that defines the chain you're joining.</li>
-        <li><code>-p2p-port 30303</code> — the port your node listens on for peer connections.</li>
+        <li><code>-genesis lxs-genesis.json</code> — the genesis file that defines the chain (ships inside every download).</li>
+        <li><code>-p2p-port 30303</code> — the port your node listens on for peers.</li>
       </ul>
-      <p class="note">Once running, your node syncs with peers and starts mining to your coinbase address — same rewards, just from the command line.</p>
+      <p class="note">The built-in binary already knows the seed, so <code>-bootstrap</code> is optional — shown here for clarity.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>Common questions</h2>
+      <p><strong>Do I need a graphics card or an ASIC?</strong> No. LXS mines on an ordinary CPU — a normal laptop or desktop is enough to start.</p>
+      <p><strong>Is my computer doing anything shady in the background?</strong> No. The miner only runs while its window is open, and it stops the moment you close it. It's open-source — you can read exactly what it does.</p>
+      <p><strong>How much will I earn?</strong> It depends on how many miners are on the network and your share of the work. We don't promise an amount — mining is real work for a real, but uncertain, reward. See the <a href="faq.html">FAQ</a> for the honest version.</p>
     </section>
   </main>
 
@@ -82,9 +111,11 @@
         <a href="tokens.html">Tokens</a>
         <a href="wallet.html">Wallet</a>
         <a href="docs.html">Docs</a>
+        <a href="faq.html">FAQ</a>
+        <a href="roadmap.html">Roadmap</a>
         <a href="https://github.com/LXS-NETWORK/LXS">GitHub</a>
       </nav>
-      <p>An open, mined, community-run blockchain. Your keys never leave your device. Not financial advice.</p>
+      <p>Anyone can mine. Rewards are real but uncertain — that's proof-of-work. Not financial advice.</p>
     </div>
   </footer>
 </body>

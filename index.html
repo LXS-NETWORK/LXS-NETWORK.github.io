@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LXS — a fair, mined, community layer-1</title>
+<title>LXS — a fair-launch, proof-of-work Layer-1 you can mine yourself</title>
+<meta name="description" content="LXS is a proof-of-work Layer-1 blockchain. No presale, no ICO, no VC round — mined from the very first block. Anyone can mine it on a normal computer and launch a token on it in one click.">
 <link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -16,14 +17,15 @@
       <a href="tokens.html">Tokens</a>
       <a href="wallet.html">Wallet</a>
       <a href="docs.html">Docs</a>
+      <a href="faq.html">FAQ</a>
     </nav>
   </header>
 
   <main>
     <section class="hero big">
       <h1>LXS</h1>
-      <p class="tag">A fair, mined, community layer-1 you can run yourself.</p>
-      <p class="sub">Proof-of-work from the first block. No pre-sale, no insiders getting a special deal — you mine the coin with your own computer, and you launch tokens with your own community.</p>
+      <p class="tag">Proof-of-work you can actually run yourself. Fair from the first block.</p>
+      <p class="sub">LXS is an independent Layer-1 blockchain, secured by mining — like Bitcoin. No presale, no ICO, no VC round. Anyone with a computer can mine the coin, and anyone can launch a token on it in one click. Nobody owns the network; the people running it do.</p>
       <div class="hero-cta">
         <a href="mine.html"><button>⛏ Start mining</button></a>
         <a href="tokens.html"><button class="ghost">🪙 Launch a token</button></a>
@@ -34,26 +36,85 @@
     <section class="tiles">
       <a class="tile" href="mine.html">
         <div class="emoji">⛏</div>
-        <h3>Start mining</h3>
-        <p>Download the miner, paste your address, and earn LXS by helping run the network.</p>
+        <h3>Mine it</h3>
+        <p>Point a normal computer at the network and earn LXS. Solo, or join the pool for steady payouts. No permission needed.</p>
       </a>
       <a class="tile" href="tokens.html">
         <div class="emoji">🪙</div>
         <h3>Launch a token</h3>
-        <p>Create a token in one click. It's instantly tradeable on a bonding curve — no upfront liquidity.</p>
+        <p>Name it, ticker it, ship it. Your coin is live and tradeable on a bonding curve in seconds — no code, no upfront liquidity.</p>
       </a>
       <a class="tile" href="docs.html">
-        <div class="emoji">📖</div>
-        <h3>How it works</h3>
-        <p>Tokenomics, mining, adding LXS to MetaMask, and how tokens live on-chain — all explained.</p>
+        <div class="emoji">🔍</div>
+        <h3>Verify it yourself</h3>
+        <p>Open-source and on-chain. Read the code, run a node, check the founder wallet. You don't have to trust us.</p>
       </a>
     </section>
 
     <section class="section card prose">
       <h2>What is LXS?</h2>
-      <p>LXS is a <strong>proof-of-work layer-1 blockchain</strong>. That means there's no company minting coins and handing them to friends — the coins come out of mining, one block at a time, and anyone with a computer can do it.</p>
-      <p>On top of the chain, anyone can <strong>launch a token with their community</strong>. Tokens are real smart contracts living on the blockchain across every node, not entries in some website's database. This website is just a window into the chain — the network keeps running whether this page is up or not.</p>
-      <p>Where does the value come from? From people actually <strong>using it</strong> — mining it, launching on it, trading on it. Nothing here promises a price or a return, and we won't pretend otherwise. LXS is worth whatever the people who show up decide to make it worth.</p>
+      <p>LXS is a <strong>proof-of-work Layer-1 blockchain</strong> — its own independent network, like Bitcoin, not a token living on someone else's chain. New coins come out of <strong>mining</strong> only, one block at a time, so there's no hidden tap of insider coins and no company minting supply and handing it to friends.</p>
+      <p>Think of it the way Bitcoin started: a level playing field where the coin is <strong>earned with real work, not printed</strong>. On top of that base, LXS adds one thing Bitcoin never did — a <strong>one-click launchpad</strong>, so any community can spin up its own token and trade it instantly. This website is just a window into the chain; the network keeps running whether this page is up or not.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>LXS by the numbers</h2>
+      <p>Live figures come straight from the network. The rest are fixed rules baked into the code — no one can change them.</p>
+      <div class="kv">
+        <div><span class="k">Blocks mined (live)</span><span class="v" id="stat-height">—</span></div>
+        <div><span class="k">Coins mined so far (live)</span><span class="v" id="stat-mined">—</span></div>
+        <div><span class="k">Miners in the pool now (live)</span><span class="v" id="stat-pminers">—</span></div>
+        <div><span class="k">Block reward</span><span class="v">50 LXS</span></div>
+        <div><span class="k">Block time</span><span class="v">~4 minutes</span></div>
+        <div><span class="k">Halving</span><span class="v">every 1,000,000 blocks</span></div>
+        <div><span class="k">Mined supply</span><span class="v">~100M over ~500 years</span></div>
+        <div><span class="k">Founder allocation (genesis)</span><span class="v">20,000,000 LXS</span></div>
+        <div><span class="k">Max supply</span><span class="v">~120,000,000 LXS</span></div>
+        <div><span class="k">Fee burn</span><span class="v">20% of every fee</span></div>
+      </div>
+      <p class="note">Live numbers read from the public RPC. If they show “—”, the network is still reachable — your browser just couldn't fetch them right now.</p>
+    </section>
+
+    <section class="section card prose">
+      <h2>Fair from block one</h2>
+      <p>Most of crypto is gatekept: presales for insiders, a premine for the team, a VC round before you ever heard of it. LXS launched the opposite way — the way you can join it today.</p>
+      <ul>
+        <li><strong>No presale. No ICO. No VC round. No whitelist.</strong> There was no fastest-fingers token sale and no early-access tier.</li>
+        <li><strong>Mined from the very first block.</strong> From genesis, anyone with a computer could mine LXS. Every coin beyond the founder allocation is earned with real work.</li>
+        <li><strong>The founder allocation is disclosed, not hidden.</strong> 20,000,000 LXS were created at genesis for the founder — that's it. It sits at a public address you can look up, and it becomes a smaller and smaller share of supply as ~100M more is mined over roughly 500 years.</li>
+      </ul>
+      <div class="callout"><strong>We won't pretend to be premine-free — we'll be honest about it.</strong> The founder holding is small, fixed, and visible on-chain. Everything else is mined, in the open, by whoever shows up. That's the whole pitch: a level field and a launch button, not a promise of profit.</div>
+    </section>
+
+    <section class="section card prose">
+      <h2>Get started in three steps</h2>
+      <ol class="steps">
+        <li><strong>Get a wallet.</strong> Open the <a href="wallet.html">LXS wallet</a> — it runs in your browser, keeps your key on your device, and needs no account or email. Or add LXS to MetaMask.</li>
+        <li><strong>Get some LXS.</strong> The fastest way is to <a href="mine.html">mine it</a> — free, on a normal computer. A brand-new wallet can also grab a little free gas from the faucet to make its first move.</li>
+        <li><strong>Use it.</strong> Send LXS to anyone, or <a href="tokens.html">launch your own token</a> and share it with your community.</li>
+      </ol>
+    </section>
+
+    <section class="section card prose">
+      <h2>Launch a token in one click</h2>
+      <p>Every community can have its own coin on LXS. Pick a name, a ticker, and an image — that's it. Your token is a real on-chain smart contract, <strong>instantly tradeable on a bonding curve</strong>, with no code to write and no upfront liquidity to seed.</p>
+      <p>The price is set by the curve, not by a pool you have to fund: buy early and you're literally early on the curve. Every launch plays by the same rules — <strong>same rules for the founder and the newest wallet.</strong></p>
+      <div class="hero-cta" style="justify-content:flex-start">
+        <a href="tokens.html"><button>🪙 Launch a coin</button></a>
+        <a href="tokens.html"><button class="ghost">Explore tokens</button></a>
+      </div>
+    </section>
+
+    <section class="section card prose">
+      <h2>Run the network. It's yours.</h2>
+      <p>LXS lives because of the people who run it. There's no application and no gatekeeper — just start.</p>
+      <ul>
+        <li><strong>Mine</strong> — secure the chain and earn LXS. <a href="mine.html">One command, or one click.</a></li>
+        <li><strong>Run a node</strong> — become part of the network so it can never be switched off from one place.</li>
+        <li><strong>Build</strong> — launch a token, read the <a href="docs.html">docs</a>, or dig into the <a href="https://github.com/LXS-NETWORK/LXS">open-source code</a>.</li>
+        <li><strong>Spread the word</strong> — the whole thing grows by adoption, one real person at a time.</li>
+      </ul>
+      <p>New here? The <a href="faq.html">FAQ</a> answers the honest questions first — who runs it, the premine, and how to verify everything yourself.</p>
     </section>
   </main>
 
@@ -65,10 +126,39 @@
         <a href="tokens.html">Tokens</a>
         <a href="wallet.html">Wallet</a>
         <a href="docs.html">Docs</a>
+        <a href="faq.html">FAQ</a>
+        <a href="roadmap.html">Roadmap</a>
         <a href="https://github.com/LXS-NETWORK/LXS">GitHub</a>
       </nav>
-      <p>An open, mined, community-run blockchain. Your keys never leave your device. Not financial advice.</p>
+      <p>An open, mined, community-run blockchain. No presale, no promises of profit. Your keys never leave your device. Not financial advice.</p>
     </div>
   </footer>
+
+  <script src="config.js"></script>
+  <script>
+  /* Progressive enhancement: fill the "by the numbers" live cells straight from
+     the public RPC. Pure content — no libraries. Fails silently, leaving the
+     honest "—" placeholder, so a fetch hiccup never breaks the page. */
+  (function () {
+    var cfg = window.LXS_CONFIG || {};
+    var rpc = cfg.RPC_URL;
+    if (!rpc) return;
+    function set(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; }
+    function coinsMined(h) { var r = 50, era = 1000000, t = 0; while (h > 0 && r >= 1e-9) { var take = Math.min(h, era); t += take * r; h -= take; r /= 2; } return t; }
+    fetch(rpc, { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || !d.result) return;
+        var h = parseInt(d.result, 16);
+        set('stat-height', h.toLocaleString());
+        set('stat-mined', Math.round(coinsMined(h)).toLocaleString() + ' LXS');
+      }).catch(function () {});
+    fetch(rpc.replace(/\/$/, '') + '/pool/stats')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d && typeof d.minersActive !== 'undefined') set('stat-pminers', String(d.minersActive)); })
+      .catch(function () {});
+  })();
+  </script>
 </body>
 </html>

@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LXS — Tokens</title>
+<title>LXS — Launch a token in one click</title>
+<meta name="description" content="Name it, ticker it, ship it. Launch a token on LXS that is instantly tradeable on a bonding curve — no code, no upfront liquidity. Same fair rules for everyone.">
 <link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -16,6 +17,7 @@
       <a href="tokens.html" class="active">Tokens</a>
       <a href="wallet.html">Wallet</a>
       <a href="docs.html">Docs</a>
+      <a href="faq.html">FAQ</a>
     </nav>
     <div class="right">
       <button id="addNet" class="ghost">Add LXS network</button>
@@ -25,8 +27,8 @@
 
   <main>
     <section class="hero">
-      <h1>Launch your token in one click</h1>
-      <p>Create a token that is instantly tradeable on a bonding curve — no code and no upfront liquidity, just a name and a symbol. Below, explore tokens others have made: anyone can buy or sell any token with LXS. (LXS is the coin; what you launch is a token on top of it.)</p>
+      <h1>Launch a token in one click</h1>
+      <p>Name it. Ticker it. Ship it. Your coin goes live and tradeable on a bonding curve in seconds — no code, no upfront liquidity, no permission needed. Buy early and you're literally early on the curve. Below, explore every token the community has launched: anyone can buy or sell any of them with LXS. <span class="dim">(LXS is the coin; what you launch is a token on top of it.)</span></p>
     </section>
 
     <section id="wallet" class="wallet card" style="display:none">
@@ -66,6 +68,19 @@
       <p class="dim" style="margin:-6px 0 14px">Every token the community has launched. Anyone can buy or sell any of them with LXS — no wallet needed just to look.</p>
       <div id="coins" class="coins"><p class="dim">Loading tokens…</p></div>
     </section>
+
+    <section class="section card prose">
+      <h2>How the fair launch works</h2>
+      <p>Launching is three inputs and one button: a <strong>name</strong>, a <strong>ticker</strong>, and an optional <strong>image</strong>. There's nothing to deploy and no liquidity pool to fund — the chain handles the hard part. The second you hit create, your token exists as a real on-chain smart contract and is <strong>tradeable immediately</strong>.</p>
+      <p>Price is set by a <strong>bonding curve</strong>, not a market maker you have to seed: as more people buy, the price moves up the curve; when they sell, it moves back down. Early buyers are early by definition. Everyone — including you, the creator — buys on the <strong>same curve at the same price the moment it opens.</strong> No presale, no hidden allocation, no team bag waiting to dump on the people who show up.</p>
+      <div class="callout"><strong>Honest note:</strong> a bonding curve is a mechanic, not a money machine. Most launched tokens go nowhere — that's true everywhere in crypto. LXS gives everyone the same fair rules and a launch button; what a token becomes is up to its community, and there are no guarantees of profit.</div>
+    </section>
+
+    <section class="section card prose">
+      <h2>Your coin. Your community. Your curve.</h2>
+      <p>A token on LXS isn't rented space on someone else's platform — it lives on the blockchain, replicated across every node, and stays alive even if this website disappears. It's yours to rally people around.</p>
+      <p>New to all this? You'll need a little LXS for gas to create. Mine some on the <a href="mine.html">Mine</a> page, or connect a fresh wallet and grab a dust-sized amount from the free faucet above. Then pick a name and ship it.</p>
+    </section>
   </main>
 
   <footer>
@@ -76,9 +91,11 @@
         <a href="tokens.html">Tokens</a>
         <a href="wallet.html">Wallet</a>
         <a href="docs.html">Docs</a>
+        <a href="faq.html">FAQ</a>
+        <a href="roadmap.html">Roadmap</a>
         <a href="https://github.com/LXS-NETWORK/LXS">GitHub</a>
       </nav>
-      <p>Every token trades instantly on its own bonding curve — no upfront liquidity. Not financial advice.</p>
+      <p>Every token trades instantly on its own bonding curve — no upfront liquidity. Same rules for everyone. Not financial advice.</p>
     </div>
   </footer>
 
