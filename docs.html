@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LXS — How it works (docs)</title>
-<meta name="description" content="Everything about LXS in plain language: what it is, proof-of-work mining, tokenomics and the disclosed founder allocation, the mining pool, tokens, the faucet, and how to verify it all yourself.">
+<meta name="description" content="Everything about LXS in plain language: what it is, proof-of-work mining, tokenomics and the founder allocation, the mining pool, tokens, the faucet, and how to verify it all yourself.">
 <link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -35,13 +35,13 @@
 
     <section class="section card prose">
       <h2>How mining works</h2>
-      <p>Mining is the process of <strong>spending computing power to confirm transactions, secure the network, and keep everyone in agreement</strong> — without any central authority. Miners race to solve a hard puzzle; the first to solve it adds the next block and collects its reward. Rewriting history would mean out-working the entire honest network at once, which is what makes the chain secure.</p>
+      <p>Mining is the process of <strong>spending computing power to confirm transactions, secure the network, and keep everyone in agreement</strong> — without any central authority. Miners race to solve a hard puzzle; the first to solve it adds the next block and collects its reward. Rewriting history would mean out-working the entire network at once, which is what makes the chain secure.</p>
       <p>You mine by running the miner app (see the <a href="mine.html">Mine</a> page) — on an ordinary CPU, no special hardware. Nodes find each other through a <strong>distributed peer directory (DHT)</strong>, so there's no central server to shut down: the network keeps going as long as anyone, anywhere, is running a node. New here? You can start mining without understanding any of the technical details.</p>
     </section>
 
     <section class="section card prose">
       <h2>The mining pool</h2>
-      <p>Finding a block solo is like a lottery — rare, but the whole 50 LXS is yours. A <strong>pool</strong> is a group of miners who combine their computing power and share the rewards fairly, so everyone gets steady payouts instead of waiting for a rare solo win.</p>
+      <p>Finding a block solo is like a lottery — rare, but the whole 50 LXS is yours. A <strong>pool</strong> is a group of miners who combine their computing power and split the rewards in proportion to the work each contributes, so everyone gets steady payouts instead of waiting for a rare solo win.</p>
       <p>When you pool-mine, your machine submits <strong>shares</strong> — proof that it's doing real work toward finding a block. When the pool wins a block, the reward is split <strong>in proportion to the shares each miner contributed</strong> (a scheme called PPLNS), and paid to your wallet automatically. The LXS pool charges <strong>0% fee</strong>, and payouts wait about 50 minutes (12 blocks) to mature so a chain reorganisation can't pay out a reward the pool never received. Connect with <code>lxs mine -pool &lt;url&gt;</code> or just pick “pool” in the miner app.</p>
     </section>
 
@@ -57,9 +57,9 @@
     </section>
 
     <section class="section card prose">
-      <h2>The founder allocation, disclosed</h2>
-      <p>Being upfront is the whole point, so here it is plainly: <strong>20,000,000 LXS were created at genesis for the founder</strong>. There was <strong>no presale, no ICO, no VC round, and no whitelist</strong> — everything beyond that founder allocation is mined, in the open, by whoever shows up.</p>
-      <p>That allocation is fixed and written into the <strong>genesis block</strong> — the same <code>lxs-genesis.json</code> that ships inside every miner download — so anyone can verify the exact amount. As ~100M more LXS is mined over the coming centuries, the founder's share becomes a smaller and smaller fraction of the total. We don't claim to be premine-free — we claim to be honest about it, and to give everyone the same rules from here on.</p>
+      <h2>The founder allocation</h2>
+      <p><strong>20,000,000 LXS were created at genesis for the founder.</strong> There was <strong>no presale, no ICO, no VC round, and no whitelist</strong> — everything beyond that founder allocation is mined by whoever shows up.</p>
+      <p>That allocation is fixed and written into the <strong>genesis block</strong> — the same <code>lxs-genesis.json</code> that ships inside every miner download — so anyone can verify the exact amount. As ~100M more LXS is mined over the coming centuries, the founder's share becomes a smaller and smaller fraction of the total.</p>
       <div class="kv">
         <div><span class="k">Genesis allocation</span><span class="v">20,000,000 LXS</span></div>
         <div><span class="k">Where it's recorded</span><span class="v">the genesis block (lxs-genesis.json)</span></div>
@@ -96,10 +96,10 @@
 
     <section class="section card prose">
       <h2>Verify it yourself</h2>
-      <p>You don't have to trust this website. Everything about LXS is open and checkable:</p>
+      <p>Everything about LXS is open and checkable:</p>
       <ul>
         <li><strong>Read the code.</strong> The full node, miner, launchpad, and pool are open-source at <a href="https://github.com/LXS-NETWORK/LXS">github.com/LXS-NETWORK/LXS</a>.</li>
-        <li><strong>Run a node.</strong> Download the same binary everyone else runs, join the network, and see the chain for yourself — you don't have to trust anyone's copy.</li>
+        <li><strong>Run a node.</strong> Download the same binary everyone else runs, join the network, and see the chain for yourself.</li>
         <li><strong>Check the balances.</strong> Add LXS to MetaMask and look up any address on the chain.</li>
         <li><strong>Mine a block.</strong> The surest proof the network is real and open is to earn a coin from it yourself.</li>
       </ul>
@@ -110,7 +110,7 @@
       <p>LXS is <strong>non-custodial</strong>: your key lives on your device, not on a server. That means you're in control — and also responsible. Whoever holds your recovery phrase or private key owns your coins, and no one can recover them for you.</p>
       <ul>
         <li><strong>Back up your recovery phrase offline</strong> and never share it. No real LXS tool will ever ask for it.</li>
-        <li><strong>Ignore anyone promising guaranteed returns</strong> or “doubling” your LXS — that's how every crypto scam starts.</li>
+        <li><strong>Ignore anyone promising guaranteed returns</strong> or to “double” your LXS.</li>
         <li><strong>Double-check addresses</strong> before sending; on-chain transfers can't be reversed.</li>
       </ul>
     </section>
