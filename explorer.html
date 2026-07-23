@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LXS Explorer — blocks, transactions & addresses</title>
+<meta name="description" content="The LXS block explorer. Search any address, transaction, or block on the LXS chain (22540) — balances, transfers, mined blocks, and live network stats.">
+<link rel="icon" type="image/svg+xml" href="lxs-logo.svg">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="explorer.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html"><img src="lxs-logo.svg" alt="LXS logo">LXS</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="mine.html">Mine</a>
+      <a href="tokens.html">Tokens</a>
+      <a href="wallet.html">Wallet</a>
+      <a href="docs.html">Docs</a>
+      <a href="explorer.html" class="active">Explorer</a>
+    </nav>
+  </header>
+
+  <div class="exp-main">
+    <div class="exp-search">
+      <input id="exp-search" placeholder="Search by address · tx hash · block number · block hash" autocomplete="off" spellcheck="false">
+      <button id="exp-search-btn">Search</button>
+    </div>
+    <div id="exp-content"><div class="loading">Loading the LXS chain…</div></div>
+  </div>
+
+  <footer>
+    <div class="foot-inner">
+      <nav class="foot-nav">
+        <a href="index.html">Home</a>
+        <a href="mine.html">Mine</a>
+        <a href="tokens.html">Tokens</a>
+        <a href="wallet.html">Wallet</a>
+        <a href="docs.html">Docs</a>
+        <a href="faq.html">FAQ</a>
+        <a href="explorer.html">Explorer</a>
+        <a href="https://github.com/LXS-NETWORK/LXS">GitHub</a>
+      </nav>
+      <p>Reads directly from the LXS network (chain 22540). Not financial advice.</p>
+    </div>
+  </footer>
+
+  <script src="explorer.js"></script>
+</body>
+</html>
