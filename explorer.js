@@ -45,8 +45,8 @@ function age(tsHex) {
   const d = Math.floor(s / 86400); return d + " day" + (d === 1 ? "" : "s") + " ago";
 }
 const dateStr = (tsHex) => { const ts = toInt(tsHex); return ts ? new Date(ts * 1000).toLocaleString() : "—"; };
-function coinsMined(h) { let r = 50, era = 1e6, t = 0; while (h > 0 && r >= 1e-9) { const k = Math.min(h, era); t += k * r; h -= k; r /= 2; } return t; }
-function blockReward(h) { let r = 50; const era = Math.floor(h / 1e6); for (let i = 0; i < era; i++) r /= 2; return r; }
+function coinsMined(h) { let r = 25, era = 1e6, t = 0; while (h > 0 && r >= 1e-9) { const k = Math.min(h, era); t += k * r; h -= k; r /= 2; } return t; }
+function blockReward(h) { let r = 25; const era = Math.floor(h / 1e6); for (let i = 0; i < era; i++) r /= 2; return r; }
 const ZERO = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 /* links */

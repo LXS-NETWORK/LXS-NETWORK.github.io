@@ -42,14 +42,14 @@
 
     <section class="section card prose">
       <h2>The mining pool</h2>
-      <p>Finding a block solo is like a lottery — rare, but the whole 50 LXS is yours. A <strong>pool</strong> is a group of miners who combine their computing power and split the rewards in proportion to the work each contributes, so everyone gets steady payouts instead of waiting for a rare solo win.</p>
+      <p>Finding a block solo is like a lottery — rare, but the whole 25 LXS is yours. A <strong>pool</strong> is a group of miners who combine their computing power and split the rewards in proportion to the work each contributes, so everyone gets steady payouts instead of waiting for a rare solo win.</p>
       <p>When you pool-mine, your machine submits <strong>shares</strong> — proof that it's doing real work toward finding a block. When the pool wins a block, the reward is split <strong>in proportion to the shares each miner contributed</strong> (a scheme called PPLNS), and paid to your wallet automatically. The LXS pool charges <strong>0% fee</strong>, and payouts wait about 50 minutes (12 blocks) to mature so a chain reorganisation can't pay out a reward the pool never received. Connect with <code>lxs mine -pool &lt;url&gt;</code> or just pick “pool” in the miner app.</p>
     </section>
 
     <section class="section card prose">
       <h2>Tokenomics</h2>
       <ul>
-        <li><strong>50 LXS per block</strong> goes to the miner who wins it (in a pool, split by contributed work).</li>
+        <li><strong>25 LXS per block</strong> goes to the miner who wins it (in a pool, split by contributed work).</li>
         <li>The reward <strong>halves every 1,000,000 blocks</strong> — roughly one era every <strong>~7.6 years</strong> — so issuance slows predictably over time. No one can change this.</li>
         <li>About <strong>100 million LXS</strong> is mined out over roughly <strong>500 years</strong>, plus a <strong>20 million</strong> genesis allocation to the founder, for a maximum of about <strong>120 million LXS</strong>.</li>
         <li><strong>20% of every transaction fee is burned</strong> (destroyed forever); the rest goes to miners.</li>
@@ -59,8 +59,8 @@
 
     <section class="section card prose">
       <h2>The founder allocation</h2>
-      <p><strong>20,000,000 LXS were created at genesis for the founder.</strong> There was <strong>no presale, no ICO, no VC round, and no whitelist</strong> — everything beyond that founder allocation is mined by whoever shows up.</p>
-      <p>That allocation is fixed and written into the <strong>genesis block</strong> — the same <code>lxs-genesis.json</code> that ships inside every miner download — so anyone can verify the exact amount. As ~100M more LXS is mined over the coming centuries, the founder's share becomes a smaller and smaller fraction of the total.</p>
+      <p><strong>70,000,000 LXS are created at genesis: 20,000,000 for the founder and 50,000,000 for liquidity &amp; ecosystem</strong> (to seed the market so people can buy LXS from the start). There was <strong>no presale, no ICO, no VC round, and no whitelist</strong> — no outside investor bought in ahead of you. The remaining <strong>50,000,000</strong> is mined by whoever shows up.</p>
+      <p>Every amount is fixed and written into the <strong>genesis block</strong> — the same <code>lxs-genesis.json</code> that ships inside every miner download — so anyone can verify it. As the 50M mined supply is earned block by block, the premine becomes a smaller fraction of the total over time.</p>
       <div class="kv">
         <div><span class="k">Genesis allocation</span><span class="v">20,000,000 LXS</span></div>
         <div><span class="k">Where it's recorded</span><span class="v">the genesis block (lxs-genesis.json)</span></div>

@@ -65,11 +65,11 @@
         <div><span class="k">Blocks mined (live)</span><span class="v" id="stat-height">—</span></div>
         <div><span class="k">Coins mined so far (live)</span><span class="v" id="stat-mined">—</span></div>
         <div><span class="k">Miners in the pool now (live)</span><span class="v" id="stat-pminers">—</span></div>
-        <div><span class="k">Block reward</span><span class="v">50 LXS</span></div>
+        <div><span class="k">Block reward</span><span class="v">25 LXS</span></div>
         <div><span class="k">Block time</span><span class="v">~4 minutes</span></div>
         <div><span class="k">Halving</span><span class="v">every 1,000,000 blocks</span></div>
-        <div><span class="k">Mined supply</span><span class="v">~100M over ~500 years</span></div>
-        <div><span class="k">Founder allocation (genesis)</span><span class="v">20,000,000 LXS</span></div>
+        <div><span class="k">Mined supply</span><span class="v">50,000,000 LXS</span></div>
+        <div><span class="k">Genesis premine</span><span class="v">70,000,000 (20M founder + 50M liquidity)</span></div>
         <div><span class="k">Max supply</span><span class="v">~120,000,000 LXS</span></div>
         <div><span class="k">Fee burn</span><span class="v">20% of every fee</span></div>
       </div>
@@ -77,13 +77,14 @@
     </section>
 
     <section class="section card prose">
-      <h2>No insiders. Just miners.</h2>
-      <p>Most chains are gatekept: presales for insiders, a team premine, a VC round before you ever heard of it. LXS works the other way — the way you can join today.</p>
+      <h2>What's premined, what's mined</h2>
+      <p>LXS is upfront about every coin. Here is the full 120,000,000 breakdown — written into the <code>lxs-genesis.json</code> that ships inside every miner download, so anyone can verify it on-chain:</p>
       <ul>
-        <li><strong>No presale. No ICO. No VC round. No whitelist.</strong> No fastest-fingers token sale, no early-access tier.</li>
-        <li><strong>Mined from the very first block.</strong> From genesis, anyone with a computer could mine LXS. Beyond the 20M founder allocation, every coin is earned by mining.</li>
-        <li><strong>A shrinking founder share.</strong> 20,000,000 LXS were created at genesis for the founder; ~100M more is mined by the community over roughly 500 years, so that share keeps getting smaller.</li>
+        <li><strong>20,000,000 — founder.</strong> Created at genesis, held by the founder.</li>
+        <li><strong>50,000,000 — liquidity &amp; ecosystem.</strong> Created at genesis to seed the market, so anyone can buy LXS with real money from the start instead of waiting years for supply.</li>
+        <li><strong>50,000,000 — mined by the community.</strong> Earned block by block at 25 LXS each, halving every 1,000,000 blocks. From genesis, anyone with a computer can mine.</li>
       </ul>
+      <p><strong>No presale. No ICO. No VC round.</strong> No outside investor bought in ahead of you — the 70M premine is disclosed here and verifiable in the genesis file.</p>
       <div class="callout"><strong>You mine it. You own it.</strong> Point a computer at the network and earn LXS — no middleman, no gatekeeper, no permission needed.</div>
     </section>
 
@@ -146,7 +147,7 @@
     var rpc = cfg.RPC_URL;
     if (!rpc) return;
     function set(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; }
-    function coinsMined(h) { var r = 50, era = 1000000, t = 0; while (h > 0 && r >= 1e-9) { var take = Math.min(h, era); t += take * r; h -= take; r /= 2; } return t; }
+    function coinsMined(h) { var r = 25, era = 1000000, t = 0; while (h > 0 && r >= 1e-9) { var take = Math.min(h, era); t += take * r; h -= take; r /= 2; } return t; }
     fetch(rpc, { method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }) })
       .then(function (r) { return r.json(); })
