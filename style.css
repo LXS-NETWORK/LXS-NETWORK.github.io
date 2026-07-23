@@ -141,7 +141,7 @@ a.tile p { margin: 0; color: var(--dim); font-size: 14px; }
 .prose ul, .prose ol { color: var(--dim); padding-left: 22px; margin: 0 0 16px; }
 .prose li { margin: 6px 0; }
 .prose strong { color: var(--text); }
-.section.card { margin-top: 20px; }
+.section.card { margin: 20px auto 0; }
 .section.card p:last-child, .section.card ul:last-child { margin-bottom: 0; }
 
 /* ---------- code ---------- */

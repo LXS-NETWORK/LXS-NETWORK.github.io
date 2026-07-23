@@ -126,6 +126,21 @@ async function connect() {
   } catch (e) { alert(e.message || e); }
 }
 
+// disconnect clears the wallet from THIS screen — the site never auto-shows an
+// address, and this wipes it after use on a shared or public computer. It only
+// forgets the connection locally (a dApp cannot truly un-approve MetaMask); the
+// key and funds are untouched.
+function disconnect() {
+  account = null;
+  document.getElementById("wallet").style.display = "none";
+  document.getElementById("wAddr").textContent = "—";
+  document.getElementById("wBal").textContent = "— LXS";
+  document.getElementById("connect").textContent = "Connect Wallet";
+  const create = document.getElementById("create");
+  create.disabled = true;
+  create.textContent = "Connect wallet to create";
+}
+
 // ---------- native LXS: balance + send ----------
 async function refreshBalance() {
   if (!account) return;
@@ -315,7 +330,10 @@ document.getElementById("create").onclick = createCoin;
 document.getElementById("refresh").onclick = loadCoins;
 document.getElementById("sendBtn").onclick = sendLXS;
 document.getElementById("getGas").onclick = getGas;
-if (window.ethereum && window.ethereum.selectedAddress) connect();
+document.getElementById("disconnect").onclick = disconnect;
+// No auto-connect: the site shows NO address until the visitor clicks "Connect
+// Wallet". On a shared/external computer nothing is exposed by simply opening
+// the page — and "Disconnect" clears it again afterwards.
 // Load the community's tokens immediately, read-only — no wallet needed to browse.
 loadCoins();
 // keep the balance fresh while the page is open
