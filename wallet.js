@@ -20,7 +20,7 @@ const setStored   = (j) => localStorage.setItem(STORE_KEY, j);
 const clearStored = () => localStorage.removeItem(STORE_KEY);
 
 /* ---------- ui helpers ---------- */
-const SCREENS = ["setup", "create", "import", "unlock", "home"];
+const SCREENS = ["setup", "create", "import", "unlock", "watch", "home"];
 function show(id) {
   SCREENS.forEach(s => {
     const el = document.getElementById("screen-" + s);
@@ -167,6 +167,38 @@ function removeWallet() {
   clearStored(); wallet = null; boot();
 }
 
+/* ---------- watch-only addresses (view any LXS address, no key) ---------- */
+const STORE_WATCH = "lxs_watch_v1";
+const getWatch = () => { try { return JSON.parse(localStorage.getItem(STORE_WATCH)) || []; } catch (e) { return []; } };
+const setWatch = (a) => localStorage.setItem(STORE_WATCH, JSON.stringify(a));
+
+function showWatch() { show("watch"); msg("watch-msg", ""); renderWatch(); }
+function watchBack() { if (wallet) openHome(); else boot(); }
+function addWatch() {
+  const v = document.getElementById("watch-input").value.trim();
+  if (!ethers.isAddress(v)) return msg("watch-msg", "Enter a valid LXS address (0x…).", "err");
+  const arr = getWatch(); if (!arr.includes(v)) arr.push(v); setWatch(arr);
+  document.getElementById("watch-input").value = ""; msg("watch-msg", "");
+  renderWatch();
+}
+function removeWatch(addr) { setWatch(getWatch().filter(a => a !== addr)); renderWatch(); }
+async function renderWatch() {
+  const list = document.getElementById("watch-list");
+  const arr = getWatch();
+  if (!arr.length) { list.innerHTML = '<p class="foot">No addresses yet — add one above.</p>'; document.getElementById("watch-total").textContent = "—"; return; }
+  list.innerHTML = arr.map(a =>
+    `<div class="addr"><div class="a">${a}</div><span class="wbal" id="wb_${a}">…</span><button class="ghost sm rmw" data-a="${a}">✕</button></div>`
+  ).join("");
+  list.querySelectorAll(".rmw").forEach(b => b.onclick = () => removeWatch(b.dataset.a));
+  let total = 0n, done = 0;
+  arr.forEach(a => {
+    provider.getBalance(a).then(bal => {
+      const el = document.getElementById("wb_" + a); if (el) el.textContent = fmt(bal) + " LXS";
+      total += bal; if (++done === arr.length) document.getElementById("watch-total").textContent = fmt(total);
+    }).catch(() => { const el = document.getElementById("wb_" + a); if (el) el.textContent = "—"; done++; });
+  });
+}
+
 /* ---------- wire up ---------- */
 window.addEventListener("DOMContentLoaded", () => {
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.onclick = fn; };
@@ -181,6 +213,13 @@ window.addEventListener("DOMContentLoaded", () => {
   on("btn-send", send);
   on("btn-getgas", getGas);
   on("btn-reveal", reveal);
+  on("btn-watch", showWatch);
+  on("btn-home-watch", showWatch);
+  on("btn-watch-add", addWatch);
+  on("btn-watch-back", watchBack);
+  const wi = document.getElementById("watch-input");
+  if (wi) wi.addEventListener("keydown", e => { if (e.key === "Enter") addWatch(); });
+  setInterval(() => { const w = document.getElementById("screen-watch"); if (w && w.style.display !== "none") renderWatch(); }, 20000);
   document.querySelectorAll(".btn-remove").forEach(b => b.onclick = removeWallet);
   document.querySelectorAll(".back-setup").forEach(b => b.onclick = () => show(getStored() ? "unlock" : "setup"));
   document.getElementById("unlock-pw").addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
