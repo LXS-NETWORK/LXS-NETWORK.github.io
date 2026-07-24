@@ -12,8 +12,12 @@ window.LXS_CONFIG = {
   // Chain ID for MetaMask / the launchpad.
   CHAIN_ID: 22540,                         // LXS mainnet
 
-  // Deployed PumpFactory (launchpad) contract address.
-  FACTORY_ADDRESS: "0xff2829484cb09c3e48f6371021de0c87964c7b2d",                     // FILLED IN AT LAUNCH — 0x… of the PumpFactory
+  // Deployed PumpFactory (launchpad) contract address — graduation-wired build.
+  FACTORY_ADDRESS: "0xEb1C2689D3be98c41DE720B1570693799D732871",   // PumpFactory v2 (auto-graduation to LxsSwap)
+
+  // LXS-native Uniswap-V2 DEX: coins graduate here once their curve takes 300 LXS.
+  SWAP_FACTORY_ADDRESS: "0x207870320b9eC645A80c42d486debD06c24866BE", // LxsSwapFactory
+  WLXS_ADDRESS: "0x35dc0B4B19D9531Bb8432bC31D5deE3c1BDE87be",         // wrapped LXS (pool base asset)
 
   // Free-gas faucet endpoint. Leave "" to default to RPC_URL + "/faucet".
   FAUCET_URL: "",                          // FILLED IN AT LAUNCH (optional)
