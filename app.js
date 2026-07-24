@@ -418,7 +418,7 @@ async function readBatch(calls) {
 const BUY_TOPIC = "0x1cbc5ab135991bd2b6a4b034a04aa2aa086dac1371cb9b16b8b5e2ed6b036bed";
 const SELL_TOPIC = "0xed7a144fad14804d5c249145e3e0e2b63a9eb455b76aee5bc92d711e9bba3e4a";
 const POOL_SWAP_TOPIC = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822";
-async function priceHistory(coin, createdBlock, pool) {
+async function priceHistory(coin, createdBlock, pool, currentPrice) {
   try {
     const from = "0x" + Math.max(0, (createdBlock || 1) - 1).toString(16);
     const bySort = (a, b) => (parseInt(a.blockNumber, 16) - parseInt(b.blockNumber, 16)) || (parseInt(a.logIndex || "0x0", 16) - parseInt(b.logIndex || "0x0", 16));
@@ -458,6 +458,12 @@ async function priceHistory(coin, createdBlock, pool) {
           if (price > 0) pts.push({ ts: pts.length, price });
         }
       }
+    }
+    // Always end the line at the CURRENT price, so a coin with a single trade (e.g. one
+    // that created+graduated in one tx) still shows its price and the move into the pool,
+    // instead of "No trades yet".
+    if (currentPrice > 0 && (pts.length === 0 || Math.abs(pts[pts.length - 1].price - currentPrice) / currentPrice > 1e-9)) {
+      pts.push({ ts: pts.length, price: currentPrice });
     }
     return pts.length >= 2 ? pts : null;
   } catch (e) { return null; }
@@ -526,7 +532,7 @@ async function renderTM(coin, createdBlock) {
     paintTrade();
     if (document.getElementById("tm-amt").value) updateQuote();
   }
-  const pts = await priceHistory(coin, createdBlock, st.pool);
+  const pts = await priceHistory(coin, createdBlock, st.pool, Number(st.price) / 1e18);
   if (tmCoin !== coin) return;
   drawTChart(document.getElementById("tm-chart"), pts);
   const el = document.getElementById("tm-chg");
