@@ -13,7 +13,8 @@ const FAUCET_URL = CONFIG.FAUCET_URL || (CONFIG.RPC_URL.replace(/\/+$/, "") + "/
 const CHAIN_ID_HEX = "0x" + CONFIG.CHAIN_ID.toString(16);
 const CREATED_TOPIC = "0x4a1c716cc2323435ec5a77a7556c84da77d1ca36f6bd248bdd6e398a18ffe14b"; // Created(address,address,string,string,bytes)
 const SEL = { name: "0x06fdde03", symbol: "0x95d89b41", reserveNative: "0xbf36b536", balanceOf: "0x70a08231",
-  virtualNative: "0xff490386", curveTokens: "0x0d93caf7", totalSupply: "0x18160ddd" };
+  virtualNative: "0xff490386", curveTokens: "0x0d93caf7", totalSupply: "0x18160ddd",
+  quoteBuy: "0x4beb394c", feeBps: "0x24a9d853" };
 
 let account = null;
 
@@ -258,7 +259,7 @@ async function curveStats(coin) {
   const mc = ctok > 0n ? (eff * tsup) / ctok : 0n;              // market cap in LXS-wei
   const sold = tsup > ctok ? tsup - ctok : 0n;
   const progress = tsup > 0n ? Number((sold * 10000n) / tsup) / 100 : 0;
-  return { coin, nm, sym, reserve, price, mc, bal, progress, tsup };
+  return { coin, nm, sym, reserve, price, mc, bal, progress, tsup, vnat, ctok };
 }
 
 async function loadCoins() {
@@ -328,7 +329,7 @@ async function sell(coin, amount) {
 }
 
 // ---------- token detail view + price chart ----------
-let tmCoin = null, tmImg = null, tmBlock = 0;
+let tmCoin = null, tmImg = null, tmBlock = 0, tmTimer = null;
 
 // One round-trip for the chart's many samples (JSON-RPC batch).
 async function readBatch(calls) {
@@ -403,6 +404,15 @@ async function openToken(coin, img, createdBlock) {
   ["tm-price", "tm-mc", "tm-liq", "tm-sup", "tm-prog"].forEach(id => document.getElementById(id).textContent = "…");
   document.getElementById("tm-chg").textContent = "";
   drawTChart(document.getElementById("tm-chart"), null);
+  tState = null; setMode("buy"); // fresh swap card for this token
+  await renderTM(coin, createdBlock);
+  // Auto-refresh while the token is open, so price + chart update live as trades land.
+  clearInterval(tmTimer);
+  tmTimer = setInterval(() => { tmCoin === coin ? renderTM(coin, createdBlock) : clearInterval(tmTimer); }, 15000);
+}
+
+// Fetch the coin's live curve state + price history and paint the open modal.
+async function renderTM(coin, createdBlock) {
   const st = await curveStats(coin).catch(() => null);
   if (!st || tmCoin !== coin) return;
   document.getElementById("tm-sym").textContent = st.sym || "?";
@@ -412,17 +422,26 @@ async function openToken(coin, img, createdBlock) {
   document.getElementById("tm-liq").textContent = fromWei(st.reserve) + " LXS";
   document.getElementById("tm-sup").textContent = fmtLxs(st.tsup);
   document.getElementById("tm-prog").textContent = Math.min(100, Math.max(0, st.progress)).toFixed(1) + "%";
+  // populate the swap card: fee (immutable, fetched once) + fresh balances
+  let feeBps = (tState && tState.coin === coin) ? tState.feeBps : null;
+  if (feeBps == null) feeBps = await ethCall(coin, SEL.feeBps).then(h => parseInt(h || "0x64", 16) || 100).catch(() => 100);
+  const lxsBal = account ? BigInt(await eth("eth_getBalance", [account, "latest"]).catch(() => "0x0") || "0x0") : 0n;
+  if (tmCoin === coin) {
+    tState = { coin, sym: st.sym, reserve: st.reserve, vnat: st.vnat, ctok: st.ctok, feeBps, tokBal: st.bal, lxsBal };
+    paintTrade();
+    if (document.getElementById("tm-amt").value) updateQuote();
+  }
   const pts = await priceHistory(coin, createdBlock);
   if (tmCoin !== coin) return;
   drawTChart(document.getElementById("tm-chart"), pts);
+  const el = document.getElementById("tm-chg");
   if (pts && pts.length >= 2 && pts[0].price > 0) {
     const chg = (pts[pts.length - 1].price - pts[0].price) / pts[0].price * 100;
-    const el = document.getElementById("tm-chg");
     el.textContent = (chg >= 0 ? "▲ +" : "▼ ") + chg.toFixed(1) + "%";
     el.className = "tchg " + (chg >= 0 ? "up" : "down");
-  }
+  } else { el.textContent = ""; }
 }
-function closeToken() { tmCoin = null; document.getElementById("tokenModal").classList.remove("open"); document.body.style.overflow = ""; try { history.replaceState(null, "", location.pathname); } catch (e) {} }
+function closeToken() { tmCoin = null; clearInterval(tmTimer); document.getElementById("tokenModal").classList.remove("open"); document.body.style.overflow = ""; try { history.replaceState(null, "", location.pathname); } catch (e) {} }
 
 // Deep-link: opening tokens.html#/token/0x… (a shared link) jumps straight to that token.
 function openTokenFromHash() {
@@ -434,8 +453,74 @@ window.addEventListener("hashchange", openTokenFromHash);
 document.getElementById("tm-close").onclick = closeToken;
 document.getElementById("tokenModal").addEventListener("click", (e) => { if (e.target.id === "tokenModal") closeToken(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeToken(); });
-document.getElementById("tm-buy").onclick = () => { if (tmCoin) { const c = tmCoin, im = tmImg, bl = tmBlock; buy(c, document.getElementById("tm-buyamt").value).then(() => setTimeout(() => tmCoin === c && openToken(c, im, bl), 2000)); } };
-document.getElementById("tm-sell").onclick = () => { if (tmCoin) { const c = tmCoin, im = tmImg, bl = tmBlock; sell(c, document.getElementById("tm-sellamt").value).then(() => setTimeout(() => tmCoin === c && openToken(c, im, bl), 2000)); } };
+// ---------- swap card (buy/sell with live quote) ----------
+let tMode = "buy", tState = null, tQuoteTimer = null;
+function fmtTok(n) {
+  if (!isFinite(n) || n <= 0) return "0";
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + "B";
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + "M";
+  if (n >= 1000) return Math.round(n).toLocaleString("en-US");
+  if (n >= 1) return n.toFixed(2);
+  return n.toPrecision(3);
+}
+function setMode(mode) {
+  tMode = mode;
+  document.getElementById("tm-tab-buy").classList.toggle("active", mode === "buy");
+  document.getElementById("tm-tab-sell").classList.toggle("active", mode === "sell");
+  document.getElementById("tm-action").className = "tbtn " + mode;
+  document.getElementById("tm-paylbl").textContent = mode === "buy" ? "You pay" : "You sell";
+  document.getElementById("tm-paysym").textContent = mode === "buy" ? "LXS" : (tState && tState.sym || "tokens");
+  document.getElementById("tm-recvsym").textContent = mode === "buy" ? (tState && tState.sym || "tokens") : "LXS";
+  document.getElementById("tm-amt").value = "";
+  document.getElementById("tm-recv").textContent = "0";
+  paintTrade();
+}
+function paintTrade() {
+  const availB = document.getElementById("tm-avail"), availS = document.getElementById("tm-availsym"), quick = document.getElementById("tm-quick");
+  const sym = tState && tState.sym || "";
+  if (!account) { availB.textContent = "connect"; availS.textContent = ""; }
+  else if (tMode === "buy") { availB.textContent = tState ? fromWei(tState.lxsBal).toLocaleString("en-US") : "…"; availS.textContent = "LXS"; }
+  else { availB.textContent = tState ? fmtTok(fromWei(tState.tokBal)) : "…"; availS.textContent = sym; }
+  quick.innerHTML = "";
+  const add = (label, fn) => { const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.onclick = fn; quick.appendChild(b); };
+  if (tMode === "buy") [1, 10, 100, 1000].forEach(a => add(a >= 1000 ? "1K" : "" + a, () => { document.getElementById("tm-amt").value = a; updateQuote(); }));
+  else [25, 50, 100].forEach(p => add(p === 100 ? "MAX" : p + "%", () => { if (tState) { document.getElementById("tm-amt").value = fromWei(tState.tokBal * BigInt(p) / 100n); updateQuote(); } }));
+  document.getElementById("tm-action").textContent = (tMode === "buy" ? "Buy " : "Sell ") + sym;
+}
+function updateQuote() {
+  clearTimeout(tQuoteTimer);
+  const recv = document.getElementById("tm-recv");
+  const amt = parseFloat(document.getElementById("tm-amt").value);
+  if (!tState || !amt || amt <= 0) { recv.textContent = "0"; return; }
+  recv.textContent = "…";
+  tQuoteTimer = setTimeout(async () => {
+    try {
+      if (tMode === "buy") {
+        const out = BigInt(await ethCall(tState.coin, SEL.quoteBuy + uint(toWei(amt))) || "0x0");
+        recv.textContent = fmtTok(fromWei(out));
+      } else {
+        const amtWei = toWei(amt), eff = tState.vnat + tState.reserve, ctok = tState.ctok;
+        const gross = ctok + amtWei > 0n ? eff - (eff * ctok) / (ctok + amtWei) : 0n;
+        const out = gross - (gross * BigInt(tState.feeBps)) / 10000n;
+        recv.textContent = fromWei(out < 0n ? 0n : out).toLocaleString("en-US");
+      }
+    } catch { recv.textContent = "—"; }
+  }, 280);
+}
+document.getElementById("tm-tab-buy").onclick = () => setMode("buy");
+document.getElementById("tm-tab-sell").onclick = () => setMode("sell");
+document.getElementById("tm-amt").oninput = updateQuote;
+document.getElementById("tm-max").onclick = () => { if (tState && account) { document.getElementById("tm-amt").value = tMode === "buy" ? fromWei(tState.lxsBal) : fromWei(tState.tokBal); updateQuote(); } else if (!account) connect(); };
+document.getElementById("tm-action").onclick = async () => {
+  if (!account) { await connect(); return; }
+  if (!tState) return;
+  const amt = document.getElementById("tm-amt").value;
+  if (!amt || Number(amt) <= 0) return alert("Enter an amount.");
+  const c = tState.coin;
+  await (tMode === "buy" ? buy(c, amt) : sell(c, amt));
+  document.getElementById("tm-amt").value = ""; document.getElementById("tm-recv").textContent = "0";
+  setTimeout(() => { if (tmCoin === c) renderTM(c, tmBlock); }, 2500);
+};
 
 // ---------- wire ----------
 document.getElementById("connect").onclick = connect;
