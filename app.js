@@ -359,11 +359,12 @@ async function priceHistory(coin, createdBlock) {
       calls.push({ method: "eth_getBlockByNumber", params: [bh, false] });
     }
     const r = await readBatch(calls);
+    const hx = (h) => { h = (h || "").trim(); return (!h || h === "0x" || h.length < 4) ? 0n : BigInt(h); }; // pre-creation blocks return "0x"
     const pts = [];
     for (let i = 0; i < blocks.length; i++) {
-      const reserve = BigInt(r[i * 4] || "0x0"), vnat = BigInt(r[i * 4 + 1] || "0x0"), ctok = BigInt(r[i * 4 + 2] || "0x0");
+      const reserve = hx(r[i * 4]), vnat = hx(r[i * 4 + 1]), ctok = hx(r[i * 4 + 2]);
       const blk = r[i * 4 + 3];
-      if (!blk || ctok === 0n) continue;
+      if (!blk || ctok === 0n) continue; // coin didn't exist yet at this block
       pts.push({ ts: parseInt(blk.timestamp, 16), price: Number((vnat + reserve) * (10n ** 18n) / ctok) / 1e18 });
     }
     return pts.length >= 2 ? pts : null;
