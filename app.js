@@ -258,7 +258,7 @@ async function curveStats(coin) {
   const mc = ctok > 0n ? (eff * tsup) / ctok : 0n;              // market cap in LXS-wei
   const sold = tsup > ctok ? tsup - ctok : 0n;
   const progress = tsup > 0n ? Number((sold * 10000n) / tsup) / 100 : 0;
-  return { coin, nm, sym, reserve, price, mc, bal, progress };
+  return { coin, nm, sym, reserve, price, mc, bal, progress, tsup };
 }
 
 async function loadCoins() {
@@ -274,11 +274,11 @@ async function loadCoins() {
     }]);
     if (!logs.length) { box.innerHTML = '<p class="dim">No tokens yet — launch the first one.</p>'; return; }
     // first data word = coin address; the thumbnail rides later in the same log
-    const coins = logs.map(lg => ({ addr: addrFromWord(lg.data.slice(0, 66)), img: imageFromLog(lg.data) }));
+    const coins = logs.map(lg => ({ addr: addrFromWord(lg.data.slice(0, 66)), img: imageFromLog(lg.data), block: parseInt(lg.blockNumber, 16) || 0 }));
     // fetch every coin's curve state, then rank by market cap so the ones with real buying float to the top
     const stats = (await Promise.all(coins.map(async c => {
       const st = await curveStats(c.addr).catch(() => null);
-      if (st) st.img = c.img;
+      if (st) { st.img = c.img; st.block = c.block; }
       return st;
     }))).filter(Boolean);
     stats.sort((a, b) => (a.mc < b.mc ? 1 : a.mc > b.mc ? -1 : 0));
@@ -303,8 +303,12 @@ function renderCoin(box, st) {
        <input class="sellAmt" type="number" placeholder="${esc(sym)}" step="1" min="0">
        <button class="sell ghost">Sell</button>
      </div>`;
-  card.querySelector(".buy").onclick = () => buy(coin, card.querySelector(".buyAmt").value);
-  card.querySelector(".sell").onclick = () => sell(coin, card.querySelector(".sellAmt").value);
+  card.querySelector(".buy").onclick = (e) => { e.stopPropagation(); buy(coin, card.querySelector(".buyAmt").value); };
+  card.querySelector(".sell").onclick = (e) => { e.stopPropagation(); sell(coin, card.querySelector(".sellAmt").value); };
+  // Clicking the card (anywhere but the trade inputs) opens the full token view with a price chart.
+  card.querySelector(".chead").onclick = () => openToken(coin, st.img, st.block);
+  card.querySelector(".sup").onclick = () => openToken(coin, st.img, st.block);
+  card.querySelector(".chead").style.cursor = "pointer";
   box.appendChild(card);
 }
 
@@ -322,6 +326,107 @@ async function sell(coin, amount) {
     setTimeout(loadCoins, 1500); setTimeout(refreshBalance, 1500);
   } catch (e) { alert(e.message || e); }
 }
+
+// ---------- token detail view + price chart ----------
+let tmCoin = null, tmImg = null, tmBlock = 0;
+
+// One round-trip for the chart's many samples (JSON-RPC batch).
+async function readBatch(calls) {
+  const body = calls.map((c, i) => ({ jsonrpc: "2.0", id: i, method: c.method, params: c.params }));
+  const res = await fetch(CONFIG.RPC_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const arr = await res.json();
+  const out = []; for (const r of (Array.isArray(arr) ? arr : [])) out[r.id] = r.result;
+  return out;
+}
+
+// Real price-over-time: sample the bonding curve at up to 40 blocks. The node keeps
+// ~128 blocks of state, so we sample from max(createdBlock, latest-120) to now.
+// price = (virtualNative + reserveNative) / curveTokens at each sampled block.
+async function priceHistory(coin, createdBlock) {
+  try {
+    const latest = parseInt(await readRpc("eth_blockNumber"), 16);
+    const start = Math.max(createdBlock || 0, latest - 120);
+    const N = Math.min(40, latest - start + 1);
+    if (N < 2) return null;
+    const blocks = [];
+    for (let i = 0; i < N; i++) blocks.push(start + Math.round(i * (latest - start) / (N - 1)));
+    const calls = [];
+    for (const b of blocks) {
+      const bh = "0x" + b.toString(16);
+      calls.push({ method: "eth_call", params: [{ to: coin, data: SEL.reserveNative }, bh] });
+      calls.push({ method: "eth_call", params: [{ to: coin, data: SEL.virtualNative }, bh] });
+      calls.push({ method: "eth_call", params: [{ to: coin, data: SEL.curveTokens }, bh] });
+      calls.push({ method: "eth_getBlockByNumber", params: [bh, false] });
+    }
+    const r = await readBatch(calls);
+    const pts = [];
+    for (let i = 0; i < blocks.length; i++) {
+      const reserve = BigInt(r[i * 4] || "0x0"), vnat = BigInt(r[i * 4 + 1] || "0x0"), ctok = BigInt(r[i * 4 + 2] || "0x0");
+      const blk = r[i * 4 + 3];
+      if (!blk || ctok === 0n) continue;
+      pts.push({ ts: parseInt(blk.timestamp, 16), price: Number((vnat + reserve) * (10n ** 18n) / ctok) / 1e18 });
+    }
+    return pts.length >= 2 ? pts : null;
+  } catch (e) { return null; }
+}
+
+function drawTChart(canvas, pts) {
+  const ctx = canvas.getContext("2d"), W = canvas.width, H = canvas.height, pad = 10;
+  ctx.clearRect(0, 0, W, H);
+  ctx.strokeStyle = "rgba(255,255,255,.05)"; ctx.lineWidth = 1;
+  for (let i = 1; i < 4; i++) { const y = pad + (H - 2 * pad) * i / 4; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke(); }
+  if (!pts || pts.length < 2) {
+    ctx.fillStyle = "#8b93a7"; ctx.font = "13px system-ui,sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("No trades yet — price appears once the curve moves", W / 2, H / 2); return;
+  }
+  const xs = pts.map(p => p.ts), ys = pts.map(p => p.price);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const X = t => pad + (W - 2 * pad) * (x1 === x0 ? 0.5 : (t - x0) / (x1 - x0));
+  const Y = v => H - pad - (H - 2 * pad) * (y1 === y0 ? 0.5 : (v - y0) / (y1 - y0));
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "rgba(70,229,161,.28)"); g.addColorStop(1, "rgba(58,160,255,.02)");
+  ctx.beginPath(); ctx.moveTo(X(xs[0]), H - pad); pts.forEach(p => ctx.lineTo(X(p.ts), Y(p.price)));
+  ctx.lineTo(X(xs[xs.length - 1]), H - pad); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+  const lg = ctx.createLinearGradient(0, 0, W, 0); lg.addColorStop(0, "#46e5a1"); lg.addColorStop(1, "#3aa0ff");
+  ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(X(p.ts), Y(p.price)) : ctx.moveTo(X(p.ts), Y(p.price)));
+  ctx.strokeStyle = lg; ctx.lineWidth = 2.2; ctx.lineJoin = "round"; ctx.stroke();
+  ctx.beginPath(); ctx.arc(X(xs[xs.length - 1]), Y(ys[ys.length - 1]), 3.5, 0, 7); ctx.fillStyle = "#46e5a1"; ctx.fill();
+}
+
+async function openToken(coin, img, createdBlock) {
+  tmCoin = coin; tmImg = img; tmBlock = createdBlock || 0;
+  const m = document.getElementById("tokenModal"); m.classList.add("open"); document.body.style.overflow = "hidden";
+  document.getElementById("tm-ic").innerHTML = img ? `<img src="${img}" alt="" onerror="this.style.visibility='hidden'">` : coinIcon(coin);
+  document.getElementById("tm-addr").textContent = coin;
+  document.getElementById("tm-sym").textContent = "…"; document.getElementById("tm-nm").textContent = "";
+  ["tm-price", "tm-mc", "tm-liq", "tm-sup", "tm-prog"].forEach(id => document.getElementById(id).textContent = "…");
+  document.getElementById("tm-chg").textContent = "";
+  drawTChart(document.getElementById("tm-chart"), null);
+  const st = await curveStats(coin).catch(() => null);
+  if (!st || tmCoin !== coin) return;
+  document.getElementById("tm-sym").textContent = st.sym || "?";
+  document.getElementById("tm-nm").textContent = st.nm || "";
+  document.getElementById("tm-price").textContent = fmtLxs(st.price);
+  document.getElementById("tm-mc").textContent = fmtLxs(st.mc) + " LXS";
+  document.getElementById("tm-liq").textContent = fromWei(st.reserve) + " LXS";
+  document.getElementById("tm-sup").textContent = fmtLxs(st.tsup);
+  document.getElementById("tm-prog").textContent = Math.min(100, Math.max(0, st.progress)).toFixed(1) + "%";
+  const pts = await priceHistory(coin, createdBlock);
+  if (tmCoin !== coin) return;
+  drawTChart(document.getElementById("tm-chart"), pts);
+  if (pts && pts.length >= 2 && pts[0].price > 0) {
+    const chg = (pts[pts.length - 1].price - pts[0].price) / pts[0].price * 100;
+    const el = document.getElementById("tm-chg");
+    el.textContent = (chg >= 0 ? "▲ +" : "▼ ") + chg.toFixed(1) + "%";
+    el.className = "tchg " + (chg >= 0 ? "up" : "down");
+  }
+}
+function closeToken() { tmCoin = null; document.getElementById("tokenModal").classList.remove("open"); document.body.style.overflow = ""; }
+
+document.getElementById("tm-close").onclick = closeToken;
+document.getElementById("tokenModal").addEventListener("click", (e) => { if (e.target.id === "tokenModal") closeToken(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeToken(); });
+document.getElementById("tm-buy").onclick = () => { if (tmCoin) { const c = tmCoin, im = tmImg, bl = tmBlock; buy(c, document.getElementById("tm-buyamt").value).then(() => setTimeout(() => tmCoin === c && openToken(c, im, bl), 2000)); } };
+document.getElementById("tm-sell").onclick = () => { if (tmCoin) { const c = tmCoin, im = tmImg, bl = tmBlock; sell(c, document.getElementById("tm-sellamt").value).then(() => setTimeout(() => tmCoin === c && openToken(c, im, bl), 2000)); } };
 
 // ---------- wire ----------
 document.getElementById("connect").onclick = connect;
