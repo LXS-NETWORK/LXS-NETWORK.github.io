@@ -13,12 +13,12 @@ window.LXS_CONFIG = {
   CHAIN_ID: 22540,                         // LXS mainnet
 
   // Deployed PumpFactory (launchpad) contract address — graduation-wired build.
-  FACTORY_ADDRESS: "0xEb1C2689D3be98c41DE720B1570693799D732871",   // PumpFactory v2 (auto-graduation to LxsSwap)
+  FACTORY_ADDRESS: "0x79D4FCBB6d55dF60c386dDcE2740dc23c8bAF967",   // PumpFactory v2 (audited: gated graduation pool)
 
   // LXS-native Uniswap-V2 DEX: coins graduate here once their curve takes 300 LXS.
-  SWAP_FACTORY_ADDRESS: "0x207870320b9eC645A80c42d486debD06c24866BE", // LxsSwapFactory
-  WLXS_ADDRESS: "0x35dc0B4B19D9531Bb8432bC31D5deE3c1BDE87be",         // wrapped LXS (pool base asset)
-  ROUTER_ADDRESS: "0x7e08CB2b4dD632B46b592A5f4E8262C42AA9E5Fa",       // LxsSwapRouter (trade graduated coins)
+  SWAP_FACTORY_ADDRESS: "0x2A04964fffdE2Ed4C4656e0751DC25f13fdB9927", // LxsSwapFactory (gated first-mint)
+  WLXS_ADDRESS: "0x35dc0B4B19D9531Bb8432bC31D5deE3c1BDE87be",         // wrapped LXS (pool base asset, unchanged)
+  ROUTER_ADDRESS: "0x4f831b258fe42082664767df6dd19884bC230488",       // LxsSwapRouter (trade graduated coins)
 
   // Free-gas faucet endpoint. Leave "" to default to RPC_URL + "/faucet".
   FAUCET_URL: "",                          // FILLED IN AT LAUNCH (optional)

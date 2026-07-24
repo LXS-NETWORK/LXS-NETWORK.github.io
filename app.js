@@ -87,8 +87,8 @@ function createCalldata(name, symbol, imgBytes, minTokensOut) {
   const head = off(0x80) + off(0x80 + nl) + off(0x80 + nl + sl) + uint(BigInt(minTokensOut || 0));
   return "0xdf5c2a2e" + head + n + s + img;                 // create(string,string,bytes,uint256)
 }
-const buyCalldata = () => "0xd96a094a" + uint(0n);           // buy(minTokensOut=0)
-const sellCalldata = (amtWei) => "0xd79875eb" + uint(amtWei) + uint(0n); // sell(amount, minNativeOut=0)
+const buyCalldata = (minWei) => "0xd96a094a" + uint(minWei);              // buy(minTokensOut)
+const sellCalldata = (amtWei, minWei) => "0xd79875eb" + uint(amtWei) + uint(minWei); // sell(amount, minNativeOut)
 
 // ---------- coin image (a thumbnail carried in the Created event, no off-chain host) ----------
 // Resize any uploaded picture to a small square JPEG so it fits under the 12 KB on-chain cap.
@@ -342,14 +342,30 @@ function renderCoin(box, st) {
 async function buy(coin, lxs) {
   if (!lxs || Number(lxs) <= 0) return alert("Enter an LXS amount to spend.");
   try {
-    await eth("eth_sendTransaction", [{ from: account, to: coin, data: buyCalldata(), value: "0x" + toWei(lxs).toString(16), gas: "0x30D40" }]);
+    // 3% slippage floor on the curve too (contract enforces minTokensOut; sending 0 invites a sandwich)
+    const q = BigInt(await ethCall(coin, SEL.quoteBuy + uint(toWei(lxs))) || "0x0");
+    await eth("eth_sendTransaction", [{ from: account, to: coin, data: buyCalldata(q * 97n / 100n), value: "0x" + toWei(lxs).toString(16), gas: "0x30D40" }]);
     setTimeout(loadCoins, 1500); setTimeout(refreshBalance, 1500);
   } catch (e) { alert(e.message || e); }
 }
 async function sell(coin, amount) {
   if (!amount || Number(amount) <= 0) return alert("Enter a token amount to sell.");
   try {
-    await eth("eth_sendTransaction", [{ from: account, to: coin, data: sellCalldata(toWei(amount)), gas: "0x30D40" }]);
+    const amtWei = toWei(amount);
+    // client-side reverse-curve quote for minNativeOut (there is no on-chain sell quote)
+    let min = 0n;
+    const [rn, vn, ct, fb] = await Promise.all([
+      ethCall(coin, SEL.reserveNative).then(h => BigInt(h || "0x0")),
+      ethCall(coin, SEL.virtualNative).then(h => BigInt(h || "0x0")),
+      ethCall(coin, SEL.curveTokens).then(h => BigInt(h || "0x0")),
+      ethCall(coin, SEL.feeBps).then(h => BigInt(h || "0x64")),
+    ]);
+    const eff = vn + rn;
+    let gross = ct + amtWei > 0n ? eff - (eff * ct) / (ct + amtWei) : 0n;
+    if (gross > rn) gross = rn;                       // contract clamps to real reserve
+    const out = gross - (gross * fb) / 10000n;
+    min = out * 97n / 100n;                            // 3% slippage floor
+    await eth("eth_sendTransaction", [{ from: account, to: coin, data: sellCalldata(amtWei, min), gas: "0x30D40" }]);
     setTimeout(loadCoins, 1500); setTimeout(refreshBalance, 1500);
   } catch (e) { alert(e.message || e); }
 }
@@ -357,20 +373,26 @@ async function sell(coin, amount) {
 // Once a coin has graduated it no longer trades on its curve — buy/sell go through
 // the LxsSwap router (native LXS <-> token, one atomic tx, 20-min deadline).
 const DEADLINE = () => BigInt(Math.floor(Date.now() / 1000) + 1200);
+// 3% slippage floor: without a real amountOutMin a swap can be sandwiched. We quote
+// on-chain, then require at least 97% of it — the tx reverts rather than fill at a
+// manipulated price.
+const minOut = (q) => q * 97n / 100n;
 async function routerBuy(coin, lxs) {
   if (!ROUTER) return alert("Router not configured.");
-  const data = SEL.rBuy + padL(coin) + uint(0n) + padL(account) + uint(DEADLINE());
+  const q = BigInt(await ethCall(ROUTER, SEL.rQuoteBuy + padL(coin) + uint(toWei(lxs))) || "0x0");
+  const data = SEL.rBuy + padL(coin) + uint(minOut(q)) + padL(account) + uint(DEADLINE());
   await eth("eth_sendTransaction", [{ from: account, to: ROUTER, data, value: "0x" + toWei(lxs).toString(16), gas: "0x7A120" }]);
   setTimeout(loadCoins, 1500); setTimeout(refreshBalance, 1500);
 }
 async function routerSell(coin, amount) {
   if (!ROUTER) return alert("Router not configured.");
   const wei = toWei(amount);
+  const q = BigInt(await ethCall(ROUTER, SEL.rQuoteSell + padL(coin) + uint(wei)) || "0x0");
   const allowed = BigInt(await ethCall(coin, SEL.allowance + padL(account) + padL(ROUTER)) || "0x0");
   if (allowed < wei) { // one-time approval so the router can pull the tokens
     await eth("eth_sendTransaction", [{ from: account, to: coin, data: SEL.approve + padL(ROUTER) + uint(wei), gas: "0x186A0" }]);
   }
-  const data = SEL.rSell + padL(coin) + uint(wei) + uint(0n) + padL(account) + uint(DEADLINE());
+  const data = SEL.rSell + padL(coin) + uint(wei) + uint(minOut(q)) + padL(account) + uint(DEADLINE());
   await eth("eth_sendTransaction", [{ from: account, to: ROUTER, data, gas: "0x7A120" }]);
   setTimeout(loadCoins, 1500); setTimeout(refreshBalance, 1500);
 }
@@ -395,23 +417,47 @@ async function readBatch(calls) {
 // are always available.) Each trade's execution price = native/tokens exchanged.
 const BUY_TOPIC = "0x1cbc5ab135991bd2b6a4b034a04aa2aa086dac1371cb9b16b8b5e2ed6b036bed";
 const SELL_TOPIC = "0xed7a144fad14804d5c249145e3e0e2b63a9eb455b76aee5bc92d711e9bba3e4a";
-async function priceHistory(coin, createdBlock) {
+const POOL_SWAP_TOPIC = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822";
+async function priceHistory(coin, createdBlock, pool) {
   try {
     const from = "0x" + Math.max(0, (createdBlock || 1) - 1).toString(16);
-    const logs = await readRpc("eth_getLogs", [{ address: coin, fromBlock: from, toBlock: "latest", topics: [[BUY_TOPIC, SELL_TOPIC]] }]);
-    if (!Array.isArray(logs) || logs.length < 1) return null;
-    logs.sort((a, b) => (parseInt(a.blockNumber, 16) - parseInt(b.blockNumber, 16)) || (parseInt(a.logIndex || "0x0", 16) - parseInt(b.logIndex || "0x0", 16)));
+    const bySort = (a, b) => (parseInt(a.blockNumber, 16) - parseInt(b.blockNumber, 16)) || (parseInt(a.logIndex || "0x0", 16) - parseInt(b.logIndex || "0x0", 16));
     const pts = [];
-    for (const l of logs) {
-      const d = (l.data || "0x").slice(2);
-      if (d.length < 128) continue;
-      const a = BigInt("0x" + d.slice(0, 64)), b = BigInt("0x" + d.slice(64, 128));
-      const isBuy = (l.topics[0] || "").toLowerCase() === BUY_TOPIC;
-      // buy: nativeIn / tokensOut · sell: nativeOut / tokensIn
-      const num = isBuy ? a : b, den = isBuy ? b : a;
-      if (den === 0n) continue;
-      const price = Number(num * (10n ** 18n) / den) / 1e18;
-      if (price > 0) pts.push({ ts: pts.length, price }); // even x-spacing per trade
+    // 1) curve phase: Buy/Sell events on the coin (execution price = native/tokens)
+    const logs = await readRpc("eth_getLogs", [{ address: coin, fromBlock: from, toBlock: "latest", topics: [[BUY_TOPIC, SELL_TOPIC]] }]).catch(() => []);
+    if (Array.isArray(logs)) {
+      logs.sort(bySort);
+      for (const l of logs) {
+        const d = (l.data || "0x").slice(2);
+        if (d.length < 128) continue;
+        const a = BigInt("0x" + d.slice(0, 64)), b = BigInt("0x" + d.slice(64, 128));
+        const isBuy = (l.topics[0] || "").toLowerCase() === BUY_TOPIC;
+        const num = isBuy ? a : b, den = isBuy ? b : a;
+        if (den === 0n) continue;
+        const price = Number(num * (10n ** 18n) / den) / 1e18;
+        if (price > 0) pts.push({ ts: pts.length, price });
+      }
+    }
+    // 2) pool phase (graduated): Swap events on the pool — so the chart continues
+    // past graduation. price = LXS moved / token moved for each swap.
+    if (pool && WLXS) {
+      const t0 = "0x" + (await ethCall(pool, SEL.token0).catch(() => "0x")).slice(-40);
+      const wlxsIs0 = t0.toLowerCase() === WLXS.toLowerCase();
+      const slogs = await readRpc("eth_getLogs", [{ address: pool, fromBlock: from, toBlock: "latest", topics: [POOL_SWAP_TOPIC] }]).catch(() => []);
+      if (Array.isArray(slogs)) {
+        slogs.sort(bySort);
+        for (const l of slogs) {
+          const d = (l.data || "0x").slice(2);
+          if (d.length < 256) continue;
+          const a0In = BigInt("0x" + d.slice(0, 64)), a1In = BigInt("0x" + d.slice(64, 128));
+          const a0Out = BigInt("0x" + d.slice(128, 192)), a1Out = BigInt("0x" + d.slice(192, 256));
+          const lxsFlow = wlxsIs0 ? a0In + a0Out : a1In + a1Out;
+          const tokFlow = wlxsIs0 ? a1In + a1Out : a0In + a0Out;
+          if (tokFlow === 0n) continue;
+          const price = Number(lxsFlow * (10n ** 18n) / tokFlow) / 1e18;
+          if (price > 0) pts.push({ ts: pts.length, price });
+        }
+      }
     }
     return pts.length >= 2 ? pts : null;
   } catch (e) { return null; }
@@ -480,7 +526,7 @@ async function renderTM(coin, createdBlock) {
     paintTrade();
     if (document.getElementById("tm-amt").value) updateQuote();
   }
-  const pts = await priceHistory(coin, createdBlock);
+  const pts = await priceHistory(coin, createdBlock, st.pool);
   if (tmCoin !== coin) return;
   drawTChart(document.getElementById("tm-chart"), pts);
   const el = document.getElementById("tm-chg");
