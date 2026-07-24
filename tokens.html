@@ -10,12 +10,11 @@
 <style>
   /* token detail modal (price chart) */
   .tmodal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;
-    background:rgba(4,6,10,.74);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);overflow-y:auto;padding:26px 14px}
-  @media (max-height:720px){.tmodal{align-items:flex-start}}
+    background:rgba(4,6,10,.74);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);overflow-y:auto;padding:14px}
   .tmodal.open{display:flex}
   .tsheet{background:linear-gradient(180deg,#12151d,#0b0d12);border:1px solid var(--line,#262c3a);border-radius:18px;
-    width:100%;max-width:620px;box-shadow:0 30px 90px rgba(0,0,0,.6);overflow:hidden}
-  .thead{display:flex;align-items:center;gap:13px;padding:20px 22px 10px}
+    width:100%;max-width:560px;box-shadow:0 30px 90px rgba(0,0,0,.6);max-height:94vh;overflow-y:auto}
+  .thead{display:flex;align-items:center;gap:13px;padding:15px 22px 8px}
   .thead .ic,.thead img{width:46px;height:46px;border-radius:13px;flex:none;object-fit:cover}
   .thead .tt{flex:1;min-width:0}
   .thead .tsym{font-size:21px;font-weight:800;letter-spacing:-.4px;line-height:1.1}
@@ -28,15 +27,15 @@
   .tprice .pv small{font-size:14px;color:var(--dim,#8b93a7);font-weight:600;letter-spacing:0}
   .tchg{font-size:13px;font-weight:800;margin-left:9px}
   .tchg.up{color:#46e5a1}.tchg.down{color:#ff6b6b}
-  .tchart{margin:12px 16px 2px}
-  .tchart canvas{width:100%;height:180px;display:block}
+  .tchart{margin:8px 16px 2px}
+  .tchart canvas{width:100%;height:132px;display:block}
   .tstats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line,#262c3a);
-    border-top:1px solid var(--line,#262c3a);border-bottom:1px solid var(--line,#262c3a);margin-top:12px}
-  .tstat{background:#0d1016;padding:12px 22px}
+    border-top:1px solid var(--line,#262c3a);border-bottom:1px solid var(--line,#262c3a);margin-top:10px}
+  .tstat{background:#0d1016;padding:9px 22px}
   .tstat .k{color:var(--dim,#8b93a7);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em}
   .tstat .v{font-size:15px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
   /* swap card */
-  .tswap{padding:14px 22px 12px}
+  .tswap{padding:12px 22px 10px}
   .tseg{display:flex;gap:6px;background:#0b0d12;border:1px solid var(--line,#262c3a);border-radius:12px;padding:4px;margin-bottom:14px}
   .tsegbtn{flex:1;background:transparent;border:0;color:var(--dim,#8b93a7);font-weight:800;font-size:14px;padding:9px;border-radius:9px;cursor:pointer;transition:.15s}
   .tsegbtn.active{background:linear-gradient(90deg,#46e5a1,#3aa0ff);color:#04120c}
@@ -153,7 +152,7 @@
         <button class="tclose" id="tm-close" aria-label="Close">✕</button>
       </div>
       <div class="tprice"><span class="pv"><span id="tm-price">—</span> <small>LXS</small></span><span class="tchg" id="tm-chg"></span></div>
-      <div class="tchart"><canvas id="tm-chart" width="600" height="180"></canvas></div>
+      <div class="tchart"><canvas id="tm-chart" width="600" height="264"></canvas></div>
       <div class="tstats">
         <div class="tstat"><div class="k">Market cap</div><div class="v" id="tm-mc">—</div></div>
         <div class="tstat"><div class="k">Liquidity</div><div class="v" id="tm-liq">—</div></div>

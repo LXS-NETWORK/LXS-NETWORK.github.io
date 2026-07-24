@@ -49,7 +49,10 @@ function fmtLxs(bi) {
   if (n === 0) return "0";
   if (n >= 1000) return Math.round(n).toLocaleString("en-US");
   if (n >= 1) return n.toFixed(2);
-  return n.toPrecision(3);
+  if (n >= 0.0001) return (+n.toPrecision(3)).toString();
+  // tiny per-token price — expand to a plain decimal, never scientific "e-7"
+  const decimals = Math.min(-Math.floor(Math.log10(n)) + 2, 18);
+  return n.toFixed(decimals).replace(/0+$/, "").replace(/\.$/, "");
 }
 
 function encBytes(bytes) {
@@ -343,30 +346,28 @@ async function readBatch(calls) {
 // Real price-over-time: sample the bonding curve at up to 40 blocks. The node keeps
 // ~128 blocks of state, so we sample from max(createdBlock, latest-120) to now.
 // price = (virtualNative + reserveNative) / curveTokens at each sampled block.
+// Real price history from Buy/Sell trade events. (The node returns only the LATEST
+// state for historical eth_call, so we can't sample the curve at old blocks — but logs
+// are always available.) Each trade's execution price = native/tokens exchanged.
+const BUY_TOPIC = "0x1cbc5ab135991bd2b6a4b034a04aa2aa086dac1371cb9b16b8b5e2ed6b036bed";
+const SELL_TOPIC = "0xed7a144fad14804d5c249145e3e0e2b63a9eb455b76aee5bc92d711e9bba3e4a";
 async function priceHistory(coin, createdBlock) {
   try {
-    const latest = parseInt(await readRpc("eth_blockNumber"), 16);
-    const start = Math.max(createdBlock || 0, latest - 120);
-    const N = Math.min(40, latest - start + 1);
-    if (N < 2) return null;
-    const blocks = [];
-    for (let i = 0; i < N; i++) blocks.push(start + Math.round(i * (latest - start) / (N - 1)));
-    const calls = [];
-    for (const b of blocks) {
-      const bh = "0x" + b.toString(16);
-      calls.push({ method: "eth_call", params: [{ to: coin, data: SEL.reserveNative }, bh] });
-      calls.push({ method: "eth_call", params: [{ to: coin, data: SEL.virtualNative }, bh] });
-      calls.push({ method: "eth_call", params: [{ to: coin, data: SEL.curveTokens }, bh] });
-      calls.push({ method: "eth_getBlockByNumber", params: [bh, false] });
-    }
-    const r = await readBatch(calls);
-    const hx = (h) => { h = (h || "").trim(); return (!h || h === "0x" || h.length < 4) ? 0n : BigInt(h); }; // pre-creation blocks return "0x"
+    const from = "0x" + Math.max(0, (createdBlock || 1) - 1).toString(16);
+    const logs = await readRpc("eth_getLogs", [{ address: coin, fromBlock: from, toBlock: "latest", topics: [[BUY_TOPIC, SELL_TOPIC]] }]);
+    if (!Array.isArray(logs) || logs.length < 1) return null;
+    logs.sort((a, b) => (parseInt(a.blockNumber, 16) - parseInt(b.blockNumber, 16)) || (parseInt(a.logIndex || "0x0", 16) - parseInt(b.logIndex || "0x0", 16)));
     const pts = [];
-    for (let i = 0; i < blocks.length; i++) {
-      const reserve = hx(r[i * 4]), vnat = hx(r[i * 4 + 1]), ctok = hx(r[i * 4 + 2]);
-      const blk = r[i * 4 + 3];
-      if (!blk || ctok === 0n) continue; // coin didn't exist yet at this block
-      pts.push({ ts: parseInt(blk.timestamp, 16), price: Number((vnat + reserve) * (10n ** 18n) / ctok) / 1e18 });
+    for (const l of logs) {
+      const d = (l.data || "0x").slice(2);
+      if (d.length < 128) continue;
+      const a = BigInt("0x" + d.slice(0, 64)), b = BigInt("0x" + d.slice(64, 128));
+      const isBuy = (l.topics[0] || "").toLowerCase() === BUY_TOPIC;
+      // buy: nativeIn / tokensOut · sell: nativeOut / tokensIn
+      const num = isBuy ? a : b, den = isBuy ? b : a;
+      if (den === 0n) continue;
+      const price = Number(num * (10n ** 18n) / den) / 1e18;
+      if (price > 0) pts.push({ ts: pts.length, price }); // even x-spacing per trade
     }
     return pts.length >= 2 ? pts : null;
   } catch (e) { return null; }
