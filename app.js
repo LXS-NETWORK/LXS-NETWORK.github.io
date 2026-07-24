@@ -14,7 +14,14 @@ const CHAIN_ID_HEX = "0x" + CONFIG.CHAIN_ID.toString(16);
 const CREATED_TOPIC = "0x4a1c716cc2323435ec5a77a7556c84da77d1ca36f6bd248bdd6e398a18ffe14b"; // Created(address,address,string,string,bytes)
 const SEL = { name: "0x06fdde03", symbol: "0x95d89b41", reserveNative: "0xbf36b536", balanceOf: "0x70a08231",
   virtualNative: "0xff490386", curveTokens: "0x0d93caf7", totalSupply: "0x18160ddd",
-  quoteBuy: "0x4beb394c", feeBps: "0x24a9d853" };
+  quoteBuy: "0x4beb394c", feeBps: "0x24a9d853",
+  // graduation: once a curve fills, the coin moves to a standard LxsSwap pool
+  graduated: "0xe7c2b772", pool: "0x16f0115b", getReserves: "0x0902f1ac", token0: "0x0dfe1681",
+  allowance: "0xdd62ed3e", approve: "0x095ea7b3",
+  // router (trade a graduated coin): quotes + swaps
+  rQuoteBuy: "0x0d7a94f6", rQuoteSell: "0xd98b2f5c", rBuy: "0xe4848a9d", rSell: "0xe64e822c" };
+const ROUTER = CONFIG.ROUTER_ADDRESS || "";
+const WLXS = CONFIG.WLXS_ADDRESS || "";
 
 let account = null;
 
@@ -248,7 +255,7 @@ function coinIcon(addr) {
 // Reads the curve state that prices a coin. price/market-cap come straight from the curve:
 // eff = virtualNative + reserveNative; price = eff/curveTokens; marketCap = price * totalSupply.
 async function curveStats(coin) {
-  const [nm, sym, reserve, vnat, ctok, tsup, bal] = await Promise.all([
+  const [nm, sym, reserve, vnat, ctok, tsup, bal, gradHex] = await Promise.all([
     ethCall(coin, SEL.name).then(decodeString),
     ethCall(coin, SEL.symbol).then(decodeString),
     ethCall(coin, SEL.reserveNative).then(h => BigInt(h || "0x0")),
@@ -256,13 +263,29 @@ async function curveStats(coin) {
     ethCall(coin, SEL.curveTokens).then(h => BigInt(h || "0x0")),
     ethCall(coin, SEL.totalSupply).then(h => BigInt(h || "0x0")),
     account ? ethCall(coin, SEL.balanceOf + padL(account)).then(h => BigInt(h || "0x0")) : Promise.resolve(0n),
+    ethCall(coin, SEL.graduated).then(h => BigInt(h || "0x0")).catch(() => 0n),
   ]);
+  // Graduated: the curve is closed and the coin trades on a standard LxsSwap pool.
+  // Price/market-cap/liquidity now come from the pool's reserves, not the curve.
+  if (gradHex !== 0n) {
+    const pool = "0x" + (await ethCall(coin, SEL.pool)).slice(-40);
+    const [t0, resHex] = await Promise.all([
+      ethCall(pool, SEL.token0).then(h => "0x" + h.slice(-40)),
+      ethCall(pool, SEL.getReserves),
+    ]);
+    const r0 = BigInt("0x" + resHex.slice(2, 66)), r1 = BigInt("0x" + resHex.slice(66, 130));
+    const coinIs0 = t0.toLowerCase() === coin.toLowerCase();
+    const rTok = coinIs0 ? r0 : r1, rLxs = coinIs0 ? r1 : r0;
+    const price = rTok > 0n ? (rLxs * (10n ** 18n)) / rTok : 0n;
+    const mc = rTok > 0n ? (rLxs * tsup) / rTok : 0n;
+    return { coin, nm, sym, reserve: rLxs, price, mc, bal, progress: 100, tsup, vnat, ctok: rTok, graduated: true, pool };
+  }
   const eff = vnat + reserve;
   const price = ctok > 0n ? (eff * (10n ** 18n)) / ctok : 0n;   // LXS-wei per 1 token
   const mc = ctok > 0n ? (eff * tsup) / ctok : 0n;              // market cap in LXS-wei
   const sold = tsup > ctok ? tsup - ctok : 0n;
   const progress = tsup > 0n ? Number((sold * 10000n) / tsup) / 100 : 0;
-  return { coin, nm, sym, reserve, price, mc, bal, progress, tsup, vnat, ctok };
+  return { coin, nm, sym, reserve, price, mc, bal, progress, tsup, vnat, ctok, graduated: false, pool: null };
 }
 
 async function loadCoins() {
@@ -329,6 +352,27 @@ async function sell(coin, amount) {
     await eth("eth_sendTransaction", [{ from: account, to: coin, data: sellCalldata(toWei(amount)), gas: "0x30D40" }]);
     setTimeout(loadCoins, 1500); setTimeout(refreshBalance, 1500);
   } catch (e) { alert(e.message || e); }
+}
+
+// Once a coin has graduated it no longer trades on its curve — buy/sell go through
+// the LxsSwap router (native LXS <-> token, one atomic tx, 20-min deadline).
+const DEADLINE = () => BigInt(Math.floor(Date.now() / 1000) + 1200);
+async function routerBuy(coin, lxs) {
+  if (!ROUTER) return alert("Router not configured.");
+  const data = SEL.rBuy + padL(coin) + uint(0n) + padL(account) + uint(DEADLINE());
+  await eth("eth_sendTransaction", [{ from: account, to: ROUTER, data, value: "0x" + toWei(lxs).toString(16), gas: "0x7A120" }]);
+  setTimeout(loadCoins, 1500); setTimeout(refreshBalance, 1500);
+}
+async function routerSell(coin, amount) {
+  if (!ROUTER) return alert("Router not configured.");
+  const wei = toWei(amount);
+  const allowed = BigInt(await ethCall(coin, SEL.allowance + padL(account) + padL(ROUTER)) || "0x0");
+  if (allowed < wei) { // one-time approval so the router can pull the tokens
+    await eth("eth_sendTransaction", [{ from: account, to: coin, data: SEL.approve + padL(ROUTER) + uint(wei), gas: "0x186A0" }]);
+  }
+  const data = SEL.rSell + padL(coin) + uint(wei) + uint(0n) + padL(account) + uint(DEADLINE());
+  await eth("eth_sendTransaction", [{ from: account, to: ROUTER, data, gas: "0x7A120" }]);
+  setTimeout(loadCoins, 1500); setTimeout(refreshBalance, 1500);
 }
 
 // ---------- token detail view + price chart ----------
@@ -422,13 +466,17 @@ async function renderTM(coin, createdBlock) {
   document.getElementById("tm-mc").textContent = fmtLxs(st.mc) + " LXS";
   document.getElementById("tm-liq").textContent = fromWei(st.reserve) + " LXS";
   document.getElementById("tm-sup").textContent = fmtLxs(st.tsup);
-  document.getElementById("tm-prog").textContent = Math.min(100, Math.max(0, st.progress)).toFixed(1) + "%";
+  document.getElementById("tm-prog").textContent = st.graduated ? "Graduated ✓" : Math.min(100, Math.max(0, st.progress)).toFixed(1) + "%";
+  const hintEl = document.getElementById("tm-hint");
+  if (hintEl) hintEl.textContent = st.graduated
+    ? "Now trading on the LxsSwap DEX pool (0.30% fee) — liquidity is locked."
+    : "Estimate — includes a 1% trade fee. Price moves along the bonding curve as people trade.";
   // populate the swap card: fee (immutable, fetched once) + fresh balances
   let feeBps = (tState && tState.coin === coin) ? tState.feeBps : null;
   if (feeBps == null) feeBps = await ethCall(coin, SEL.feeBps).then(h => parseInt(h || "0x64", 16) || 100).catch(() => 100);
   const lxsBal = account ? BigInt(await eth("eth_getBalance", [account, "latest"]).catch(() => "0x0") || "0x0") : 0n;
   if (tmCoin === coin) {
-    tState = { coin, sym: st.sym, reserve: st.reserve, vnat: st.vnat, ctok: st.ctok, feeBps, tokBal: st.bal, lxsBal };
+    tState = { coin, sym: st.sym, reserve: st.reserve, vnat: st.vnat, ctok: st.ctok, feeBps, tokBal: st.bal, lxsBal, graduated: st.graduated, pool: st.pool };
     paintTrade();
     if (document.getElementById("tm-amt").value) updateQuote();
   }
@@ -496,7 +544,11 @@ function updateQuote() {
   recv.textContent = "…";
   tQuoteTimer = setTimeout(async () => {
     try {
-      if (tMode === "buy") {
+      if (tState.graduated) { // quote against the LxsSwap pool via the router
+        const sel = tMode === "buy" ? SEL.rQuoteBuy : SEL.rQuoteSell;
+        const out = BigInt(await ethCall(ROUTER, sel + padL(tState.coin) + uint(toWei(amt))) || "0x0");
+        recv.textContent = tMode === "buy" ? fmtTok(fromWei(out)) : fromWei(out).toLocaleString("en-US");
+      } else if (tMode === "buy") {
         const out = BigInt(await ethCall(tState.coin, SEL.quoteBuy + uint(toWei(amt))) || "0x0");
         recv.textContent = fmtTok(fromWei(out));
       } else {
@@ -518,7 +570,8 @@ document.getElementById("tm-action").onclick = async () => {
   const amt = document.getElementById("tm-amt").value;
   if (!amt || Number(amt) <= 0) return alert("Enter an amount.");
   const c = tState.coin;
-  await (tMode === "buy" ? buy(c, amt) : sell(c, amt));
+  if (tState.graduated) await (tMode === "buy" ? routerBuy(c, amt) : routerSell(c, amt));
+  else await (tMode === "buy" ? buy(c, amt) : sell(c, amt));
   document.getElementById("tm-amt").value = ""; document.getElementById("tm-recv").textContent = "0";
   setTimeout(() => { if (tmCoin === c) renderTM(c, tmBlock); }, 2500);
 };

@@ -18,6 +18,7 @@ window.LXS_CONFIG = {
   // LXS-native Uniswap-V2 DEX: coins graduate here once their curve takes 300 LXS.
   SWAP_FACTORY_ADDRESS: "0x207870320b9eC645A80c42d486debD06c24866BE", // LxsSwapFactory
   WLXS_ADDRESS: "0x35dc0B4B19D9531Bb8432bC31D5deE3c1BDE87be",         // wrapped LXS (pool base asset)
+  ROUTER_ADDRESS: "0x7e08CB2b4dD632B46b592A5f4E8262C42AA9E5Fa",       // LxsSwapRouter (trade graduated coins)
 
   // Free-gas faucet endpoint. Leave "" to default to RPC_URL + "/faucet".
   FAUCET_URL: "",                          // FILLED IN AT LAUNCH (optional)
