@@ -394,6 +394,7 @@ function drawTChart(canvas, pts) {
 
 async function openToken(coin, img, createdBlock) {
   tmCoin = coin; tmImg = img; tmBlock = createdBlock || 0;
+  if (!location.hash.includes(coin)) { try { history.replaceState(null, "", "#/token/" + coin); } catch (e) {} } // shareable link
   const m = document.getElementById("tokenModal"); m.classList.add("open"); document.body.style.overflow = "hidden";
   document.getElementById("tm-ic").innerHTML = img ? `<img src="${img}" alt="" onerror="this.style.visibility='hidden'">` : coinIcon(coin);
   document.getElementById("tm-addr").textContent = coin;
@@ -420,7 +421,14 @@ async function openToken(coin, img, createdBlock) {
     el.className = "tchg " + (chg >= 0 ? "up" : "down");
   }
 }
-function closeToken() { tmCoin = null; document.getElementById("tokenModal").classList.remove("open"); document.body.style.overflow = ""; }
+function closeToken() { tmCoin = null; document.getElementById("tokenModal").classList.remove("open"); document.body.style.overflow = ""; try { history.replaceState(null, "", location.pathname); } catch (e) {} }
+
+// Deep-link: opening tokens.html#/token/0x… (a shared link) jumps straight to that token.
+function openTokenFromHash() {
+  const m = location.hash.match(/token\/(0x[0-9a-fA-F]{40})/);
+  if (m) openToken(m[1], null, 0);
+}
+window.addEventListener("hashchange", openTokenFromHash);
 
 document.getElementById("tm-close").onclick = closeToken;
 document.getElementById("tokenModal").addEventListener("click", (e) => { if (e.target.id === "tokenModal") closeToken(); });
@@ -441,5 +449,6 @@ document.getElementById("disconnect").onclick = disconnect;
 // the page — and "Disconnect" clears it again afterwards.
 // Load the community's tokens immediately, read-only — no wallet needed to browse.
 loadCoins();
+openTokenFromHash(); // honor a shared #/token/… link on first load
 // keep the balance fresh while the page is open
 setInterval(refreshBalance, 15000);
